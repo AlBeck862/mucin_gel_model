@@ -1,0 +1,7 @@
+Lattice units: 10^-2 um scaling
+walks A-E: 300s (3000 time points)
+walks F-M: 500s (5000 time points)
+hist_walksF-M: histogram for walks F through M (plus two other walks not saved)
+
+Notes:
+- Walks L and M display a graphical glitch as a result of not clearing excess zeros in the matrix which stores walk data for walks that ended with a boundary immobilization. This glitch was purely graphical and did not affect the corresponding histogram. The glitch has since been fixed.

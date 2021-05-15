@@ -16,9 +16,9 @@ num_regions = 8;
 % num_regions = subregions(heterogeneity,lattice_area);
 
 % Set diffusivity values for each region
-% via: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4918968 **RESEARCH THIS FURTHER
-min_diffusivity = 0.05; %um^2/s
-max_diffusivity = 0.7; %um^2/s
+% estimated via Wagner et al. Biomacromolecules article
+min_diffusivity = 0.1; %um^2/s
+max_diffusivity = 1.25; %um^2/s
 diffusivities = min_diffusivity + (max_diffusivity-min_diffusivity).*rand(1,num_regions);
 
 % Generate the "root" points of each region. The regions will grow outward from these points.
