@@ -1,0 +1,5 @@
+Lattice units: 10^-2 um scaling
+walks A-C: 500s (5000 time points), random start locations
+
+Notes:
+- The histogram still features two distinct populations despite the random start locations. The lattice's (lack of) heterogeneity is likely the cause of this particular histogram shape.

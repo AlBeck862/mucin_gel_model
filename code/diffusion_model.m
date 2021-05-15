@@ -13,6 +13,7 @@ tau = 0.1; %base lag time
 time = 500; %simulation time in seconds
 time_pts = ceil(time/tau); %total time points
 n = 3; %number of simulated particles.
+random_start = 1; %0: all particles start at the center of the lattice, 1: particles are each assigned a random start location
 
 % Fetch a lattice
 try
@@ -36,16 +37,31 @@ lattice_x = size(lattice,2);
 lattice_y = size(lattice,1);
 
 % Particle start location **ADD A WAY TO RANDOMIZE THIS
-x_start = round(lattice_x/2);
-y_start = round(lattice_y/2);
+if random_start == 1
+    % A margin must be set to avoid starting too close to the boundary
+    margin_percent_x = 10; %the particle won't start within 10% of the lattice's x-length from the boundary on both sides (e.g.: lattice_x=10000 --> the particle's starting x-coordinate can be between 1000 and 9000)
+    start_margin_x = round(lattice_x/margin_percent_x);
+    min_start_x = start_margin_x;
+    max_start_x = lattice_x-start_margin_x;
+    
+    % A margin must be set to avoid starting too close to the boundary
+    margin_percent_y = 10; %the particle won't start within 10% of the lattice's y-length from the boundary on both sides (e.g.: lattice_y=10000 --> the particle's starting y-coordinate can be between 1000 and 9000)
+    start_margin_y = round(lattice_y/margin_percent_y);
+    min_start_y = start_margin_y;
+    max_start_y = lattice_y-start_margin_y;
+    
+    % Select a random start location at a sufficient distance from the boundary
+    x_start = round(min_start_x + (max_start_x-min_start_x).*rand());
+    y_start = round(min_start_y + (max_start_y-min_start_y).*rand());
+else
+    % The particle will start at the center of the lattice
+    x_start = round(lattice_x/2);
+    y_start = round(lattice_y/2);
+end
 
 % Rescale lattice for motion compatibility
 displacements = round(100*sqrt(lattice)); %UNITS: 10^-2 um
 
-% displacements(8000:8025,1:10)
-% min(min(displacements))
-% max(max(displacements))
-% dsbfiuas
 % Matrix to store all relevant simulation data
 data_matrix = zeros(n,time_pts,2); %for each particle at each time point, store the current x and y coordinates
 
