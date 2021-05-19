@@ -1,0 +1,8 @@
+Lattice units: 10^-2 um scaling
+Number of walks: 10
+Time points (each particle): 5000
+Random start locations: yes
+histogram_1dt: normalized histogram of displacements for 1*delta-t
+histogram_5dt: normalized histogram of displacements for 5*delta-t
+histogram_10dt: normalized histogram of displacements for 10*delta-t (a processing error led to the incorrect data points beyond -4000 in the plot)
+histogram_10dt_corrected: normalized histogram of displacements for 10*delta-t (the processing error was corrected)

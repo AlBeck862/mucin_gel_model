@@ -1,4 +1,4 @@
 Lattice units: 10^-2 um scaling
 walks A-J: 5000 time points, random start locations
 squared_dispmnt-abs_time: plot of squared displacement versus absolute time
-histogram_pos-neg: normalized histogram of displacements wherein positive (up, right) and negative (down, left) steps are signed appropriately
+histogram: normalized histogram of displacements wherein positive (up, right) and negative (down, left) steps are signed appropriately
