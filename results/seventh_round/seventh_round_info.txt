@@ -1,0 +1,7 @@
+Lattice units: 10^-2 um scaling
+Number of walks: 25
+Time points (each particle): 5000
+Random start locations: yes
+Walk samples A-I: 10 example walks of the 25 that were simulated
+squared_dispmnt-abs_time: plot of squared displacement versus absolute time curves as well as the corresponding MSD(delta-t) curve
+histogram_pos-neg: normalized histogram of displacements wherein positive (up, right) and negative (down, left) steps are signed appropriately

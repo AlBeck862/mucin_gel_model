@@ -19,7 +19,8 @@ num_regions = 8;
 % estimated via Wagner et al. Biomacromolecules article
 min_diffusivity = 0.1; %um^2/s
 max_diffusivity = 1.25; %um^2/s
-diffusivities = min_diffusivity + (max_diffusivity-min_diffusivity).*rand(1,num_regions);
+% diffusivities = min_diffusivity + (max_diffusivity-min_diffusivity).*rand(1,num_regions);
+diffusivities = linspace(min_diffusivity,max_diffusivity,num_regions); % ** MANUALLY FORCED HETEROGENEITY
 
 % Generate the "root" points of each region. The regions will grow outward from these points.
 region_start_pts = [randi([1,lattice_size_x],num_regions,1),randi([1,lattice_size_y],num_regions,1)];

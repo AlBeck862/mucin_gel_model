@@ -1,0 +1,4 @@
+Lattice units: 10^-2 um scaling
+walks A-E: 1000 time points, fixed start locations
+squared_dispmnt-abs_time: plot of squared displacement versus absolute time. Note that, while not MSD(delta-t) was computed, the general trend appears to be subdiffusive.
+histogram_pos-neg: normalized histogram of displacements wherein positive (up, right) and negative (down, left) steps are signed appropriately
