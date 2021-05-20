@@ -1,6 +1,9 @@
 % Diffusion model
 % IMPORTANT NOTE: the x- and y-axis are reversed due to MATLAB row-column data storage convention
 
+% If the following line is uncommented, all workspace variables will be deleted when the script is run
+% clearvars
+
 %%% PARAMETERS %%%
 % Lattice parameters
 visualize_lattice = 1; %0: no visualization, 1: visualization
@@ -10,12 +13,15 @@ lattice_x = 1e4;
 lattice_y = 1e4;
 
 % Simulation parameters
-% tau = 0.1; %base lag time
+tau = 0.1; %base lag time
 % time = 500; %simulation time in seconds
 % time_pts = ceil(time/tau); %total time points
 time_pts = 5000; %total time points (absolute time, camera frame-rate)
-n = 5; %number of simulated particles.
+n = 25; %number of simulated particles.
 random_start = 1; %0: all particles start at the center of the lattice, 1: particles are each assigned a random start location
+
+% Plotting parameters
+multiples_delta_time = [5,10,50,100]; %additional time point intervals for displacement histogram generation (each value corresponds to a histogram)
 
 %%% SET UP %%%
 % Fetch a lattice
@@ -25,7 +31,9 @@ try
     disp('Lattice loaded from file.')
 catch
     disp('No pre-existing lattice is available. Generating a new lattice.')
+    tic %begin benchmarking
     lattice = gen_lattice(save_lattice,heterogeneity,lattice_x,lattice_y);
+    toc %end benchmarking
     disp('Lattice generated successfully.')
 end
 
@@ -94,7 +102,7 @@ for i = 1:n %iterate through each particle
         try
             current_displacement_center = displacements(data_matrix(i,j-1,1),data_matrix(i,j-1,2));
         catch
-            disp('WARNING. Particle struck the boundary and was rendered immobile.')
+            disp('WARNING. The particle struck the boundary and was rendered immobile.')
             data_matrix(i,j-1,1) = 0; %remove the displacement that crosses the boundary
             data_matrix(i,j-1,2) = 0; %remove the displacement that crosses the boundary
             boundary_collision(i) = 1; %remember that this particle struck the boundary
@@ -157,11 +165,10 @@ current_displacement_storage(current_displacement_storage==0) = [];
 figure()
 histogram(current_displacement_storage, 'Normalization', 'probability')
 title('Step Size Distribution')
-xlabel('Step Size')
-ylabel('Frequency')
+xlabel('\Deltax, \Deltay [10^{-2}\mum]')
+ylabel('P(\Deltax, \Deltay, \Delta\tau=1 time point)')
 
 % Histograms for displacements using greater multiples of delta-t (iteratively: multiples_delta_time*(delta-t))
-multiples_delta_time = [5,10]; %additional time point intervals for displacement measurements
 histogram_data = zeros(n,time_pts,size(multiples_delta_time,2));
 counter_hist = 1;
 for dt = multiples_delta_time
@@ -199,8 +206,10 @@ for i = 1:size(multiples_delta_time,2)
     figure()
     histogram(hist_plotting, 'Normalization', 'probability')
     title('Step Size Distribution')
-    xlabel('Step Size')
-    ylabel('Frequency')
+    xlabel('\Deltax, \Deltay [10^{-2}\mum]')
+    hist_y_label_str = strcat(['P(\Deltax, \Deltay, \Delta\tau=' num2str(multiples_delta_time(i)) ' time points)']);
+    ylabel(hist_y_label_str)
+    
 end
 
 %%% MSD(DELTA-T) %%%
@@ -241,6 +250,9 @@ end
 % Plot the corresponding MSD(delta-t) curve
 msd_dt = sum(msd_dt_data,1)./sum(msd_dt_data~=0,1);
 plot(msd_dt,'LineWidth',2,'Color','red')
+title('Squared Displacement vs. Absolute Time')
+xlabel('Absolute Time \Deltat [simulation time points]')
+ylabel('MSD(\Deltat) [(10^{-2}\mum)^2]')
 
 %%% TIME-AVERAGED MSD(DELTA-TAU) %%%
 % Time-averaged MSD(delta-tau) plot
@@ -265,7 +277,11 @@ for i = 1:n
     for j = 1:size(delta_taus,2)
         if boundary_collision(i) == 1 %only modify the displacement data if the given  particle strikes the boundary
             first_zero_idx = find(((sqd_dispmnts_lag_time(i,:,j)==0)+([diff(sqd_dispmnts_lag_time(i,:,j)) 0]==0))==2,1); %find the index of the two consecutive zeros in sqd_dispmnts_lag_time for the given multiple of delta-t
-            sqd_dispmnts_lag_time(i,(first_zero_idx-delta_taus(j)):first_zero_idx-1,j) = 0; %remove the appropriate number of erroneous displacements
+            try
+                sqd_dispmnts_lag_time(i,(first_zero_idx-delta_taus(j)):first_zero_idx-1,j) = 0; %remove the appropriate number of erroneous displacements
+            catch
+                sqd_dispmnts_lag_time(i,:,j) = 0; %remove all displacements if the particle is immobilized at a time point lesser than the value of the time lag
+            end
         end
     end
 end
@@ -289,15 +305,36 @@ for i = 1:n
     hold on
 end
 
-msd_tau_plotting = mean(sdlt_plotting,1);
-plot(msd_tau_plotting,'LineWidth',2,'Color','red')
+% FIRST METHOD %
+% Remove trajectories that would break the MSD(delta-tau) curve
+while any(any(isnan(sdlt_plotting))) %loop as long as there are NaN values in the matrix
+    for i = 1:size(sdlt_plotting,1) %loop over the current size of the matrix (since rows may be removed, the matrix's size may change with each while loop iteration)
+        if any(isnan(sdlt_plotting(i,:)))
+            sdlt_plotting(i,:) = []; %remove rows (particle trajectories) that contain NaN values
+            break
+        end
+    end
+end
 
-% OLD METHOD: NO REMOVAL OF ZEROS
-% avg_sqd_dispmnts_lag_time = mean(sqd_dispmnts_lag_time,2); %average the displacement values
-% avg_sqd_dispmnts_lag_time = reshape(avg_sqd_dispmnts_lag_time,n,[]); %reorganize the data for plotting
+% Set up the plot for the corresponding time-averaged MSD(delta-tau) curve
+msd_tau_plotting = mean(sdlt_plotting,1);
+% FIRST METHOD
+
+% SECOND METHOD %
+% % Convert NaN values (resulting from entirely-zero walks) to zeros to avoid breaking the MSD(delta-tau) curve
+% sdlt_plotting(isnan(sdlt_plotting)) = 0;
 % 
-% figure()
-% for i = 1:n
-%     plot(avg_sqd_dispmnts_lag_time(i,:))
-%     hold on
+% % Set up the plot for the corresponding time-averaged MSD(delta-tau) curve
+% msd_tau_plotting = zeros(1,size(delta_taus,2));
+% for i = 1:size(delta_taus,2)
+%     sdlt_plotting_no_zeros = sdlt_plotting(:,i);
+%     sdlt_plotting_no_zeros(sdlt_plotting_no_zeros==0) = [];
+%     msd_tau_plotting(i) = mean(sdlt_plotting_no_zeros);
 % end
+% SECOND METHOD %
+
+% Plot the corresponding time-averaged MSD(delta-tau) curve
+plot(msd_tau_plotting,'LineWidth',2,'Color','red')
+title('Time-Averaged Squared Displacement vs. Lag Time')
+xlabel('Lag Time \Delta\tau [simulation time points]')
+ylabel('Time-Averaged MSD(\Delta\tau) [(10^{-2}\mum)^2]')
