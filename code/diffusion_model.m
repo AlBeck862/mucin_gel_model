@@ -1,8 +1,7 @@
+tic
+
 % Diffusion model
 % IMPORTANT NOTE: the x- and y-axis are reversed due to MATLAB row-column data storage convention
-
-% If the following line is uncommented, all workspace variables will be deleted when the script is run
-% clearvars
 
 %%% PARAMETERS %%%
 % Lattice parameters
@@ -13,15 +12,15 @@ lattice_x = 1e4;
 lattice_y = 1e4;
 
 % Simulation parameters
-tau = 0.1; %base lag time
+tau = 0.1; %step unit (this must still be related back to time)
 % time = 500; %simulation time in seconds
 % time_pts = ceil(time/tau); %total time points
 time_pts = 5000; %total time points (absolute time, camera frame-rate)
-n = 25; %number of simulated particles.
+n = 3; %number of simulated particles.
 random_start = 1; %0: all particles start at the center of the lattice, 1: particles are each assigned a random start location
 
 % Plotting parameters
-multiples_delta_time = [5,10,50,100]; %additional time point intervals for displacement histogram generation (each value corresponds to a histogram)
+multiples_delta_time = [1,5,10,50,100]; %additional time point intervals for displacement histogram generation (each value corresponds to a histogram)
 
 %%% SET UP %%%
 % Fetch a lattice
@@ -47,8 +46,8 @@ end
 lattice_x = size(lattice,2);
 lattice_y = size(lattice,1);
 
-% Convert lattice diffusivity values to (average) particle displacement values
-displacements = round(100*sqrt(lattice)); %UNITS: 10^-2 um
+% Convert true lattice diffusivity values to diffusivity values more appropriate for simulations
+adjusted_diffusivities = round(10000*lattice); %UNITS: 10^-4 um^2/s
 
 % Matrix to store all relevant simulation data
 data_matrix = zeros(n,time_pts,2); %for each particle at each time point, store the current x and y coordinates
@@ -100,7 +99,7 @@ for i = 1:n %iterate through each particle
     disp(disp_message_particle)
     for j = 2:time_pts %for each particle, iterate through each time point
         try
-            current_displacement_center = displacements(data_matrix(i,j-1,1),data_matrix(i,j-1,2));
+            current_displacement_center = adjusted_diffusivities(data_matrix(i,j-1,1),data_matrix(i,j-1,2));
         catch
             disp('WARNING. The particle struck the boundary and was rendered immobile.')
             data_matrix(i,j-1,1) = 0; %remove the displacement that crosses the boundary
@@ -109,7 +108,9 @@ for i = 1:n %iterate through each particle
             break
         end
         
-        current_displacement = current_displacement_center + round(get_dispmnt_variation(current_displacement_center,tau));
+%         current_displacement = current_displacement_center + round(get_dispmnt_variation(current_displacement_center^2,tau));
+%         current_displacement_center = current_displacement_center^2;
+        current_displacement = round(get_dispmnt_variation(current_displacement_center,tau));
         direction_select = randi(4); %randomly select a direction
         
         if direction_select == 1 %+x (RIGHT)
@@ -159,57 +160,115 @@ end
 
 %%% HISTOGRAMS %%%
 % Histogram for all displacements (1*(delta-t))
-current_displacement_storage = reshape(current_displacement_storage,[1,numel(current_displacement_storage)]); %combine all particles' data into a one-dimensional array
-current_displacement_storage(current_displacement_storage==0) = [];
+clearvars all_displacement_storage
+all_displacement_storage = [];
+for i = 1:n
+    all_displacement_storage = [all_displacement_storage no_trailing_zeros(current_displacement_storage(i,:))];
+end
+
+% current_displacement_storage = reshape(current_displacement_storage,[1,numel(current_displacement_storage)]); %combine all particles' data into a one-dimensional array
+% current_displacement_storage(current_displacement_storage==0) = [];
 
 figure()
-histogram(current_displacement_storage, 'Normalization', 'probability')
+histogram(all_displacement_storage, 'Normalization', 'pdf')
 title('Step Size Distribution')
 xlabel('\Deltax, \Deltay [10^{-2}\mum]')
 ylabel('P(\Deltax, \Deltay, \Delta\tau=1 time point)')
 
+% % Histograms for displacements using greater multiples of delta-t (iteratively: multiples_delta_time*(delta-t))
+% histogram_data = zeros(n,time_pts,size(multiples_delta_time,2));
+% counter_hist = 1;
+% for dt = multiples_delta_time
+%     for i = 1:n
+%         for j = 1:time_pts-dt
+%             hist_displacement_x = data_matrix(i,j+dt,1) - data_matrix(i,j,1);
+%             hist_displacement_y = data_matrix(i,j+dt,2) - data_matrix(i,j,2);
+%             % If both displacement components are negative or if the x component is negative and the y component is positive, the displacement is considered to be negative
+%             if (hist_displacement_x<0 && hist_displacement_y<0) || (hist_displacement_x<0 && hist_displacement_y>0)
+%                 histogram_data(i,j,counter_hist) = -sqrt(hist_displacement_x^2 + hist_displacement_y^2);
+%             else
+%                 histogram_data(i,j,counter_hist) = sqrt(hist_displacement_x^2 + hist_displacement_y^2);
+%             end
+%         end
+%     end
+%     counter_hist = counter_hist + 1;
+% end
+
+% % Remove erroneous displacements that result from a particle striking the boundary
+% for i = 1:n
+%     for j = 1:size(multiples_delta_time,2)
+%         if boundary_collision(i) == 1 %only modify the displacement data if the given particle strikes the boundary
+%             first_zero_idx = find(((histogram_data(i,:,j)==0)+([diff(histogram_data(i,:,j)) 0]==0))==2,1); %find the index of the two consecutive zeros in histogram_data for the given multiple of delta-t
+%             histogram_data(i,(first_zero_idx-multiples_delta_time(j)):first_zero_idx-1,j) = 0; %remove the appropriate number of erroneous displacements
+%         end
+%     end
+% end
+
+% % Generate one histogram for each multiple of delta-t
+% for i = 1:size(multiples_delta_time,2)
+%     hist_plotting = histogram_data(:,:,i);
+%     clearvars all_displacement_storage
+%     all_displacement_storage = [];
+%     for j = 1:n
+%         all_displacement_storage = [all_displacement_storage no_trailing_zeros(hist_plotting(j,:))];
+%     end
+%     
+% %     hist_plotting = reshape(hist_plotting,[1,numel(hist_plotting)]);
+% %     hist_plotting(hist_plotting==0) = [];
+% 
+%     figure()
+%     histogram(all_displacement_storage, 'Normalization', 'pdf')
+%     title('Step Size Distribution')
+%     xlabel('\Deltax, \Deltay [10^{-2}\mum]')
+%     hist_y_label_str = strcat(['P(\Deltax, \Deltay, \Delta\tau=' num2str(multiples_delta_time(i)) ' time points)']);
+%     ylabel(hist_y_label_str)
+% end
+
 % Histograms for displacements using greater multiples of delta-t (iteratively: multiples_delta_time*(delta-t))
-histogram_data = zeros(n,time_pts,size(multiples_delta_time,2));
+histogram_data_x = zeros(n,time_pts,size(multiples_delta_time,2));
+histogram_data_y = zeros(n,time_pts,size(multiples_delta_time,2));
 counter_hist = 1;
 for dt = multiples_delta_time
     for i = 1:n
         for j = 1:time_pts-dt
-            hist_displacement_x = data_matrix(i,j+dt,1) - data_matrix(i,j,1);
-            hist_displacement_y = data_matrix(i,j+dt,2) - data_matrix(i,j,2);
-            % If both displacement components are negative or if the x component is negative and the y component is positive, the displacement is considered to be negative
-            if (hist_displacement_x<0 && hist_displacement_y<0) || (hist_displacement_x<0 && hist_displacement_y>0)
-                histogram_data(i,j,counter_hist) = -sqrt(hist_displacement_x^2 + hist_displacement_y^2);
-            else
-                histogram_data(i,j,counter_hist) = sqrt(hist_displacement_x^2 + hist_displacement_y^2);
-            end
+            histogram_data_x(i,j,counter_hist) = data_matrix(i,j+dt,1) - data_matrix(i,j,1);
+            histogram_data_y(i,j,counter_hist) = data_matrix(i,j+dt,2) - data_matrix(i,j,2);
         end
     end
     counter_hist = counter_hist + 1;
 end
 
-% Remove erroneous displacements that result from a particle striking the boundary
-for i = 1:n
-    for j = 1:size(multiples_delta_time,2)
-        if boundary_collision(i) == 1 %only modify the displacement data if the given  particle strikes the boundary
-            first_zero_idx = find(((histogram_data(i,:,j)==0)+([diff(histogram_data(i,:,j)) 0]==0))==2,1); %find the index of the two consecutive zeros in histogram_data for the given multiple of delta-t
-            histogram_data(i,(first_zero_idx-multiples_delta_time(j)):first_zero_idx-1,j) = 0; %remove the appropriate number of erroneous displacements
+for j = 1:size(multiples_delta_time,2)
+    clearvars all_displacement_storage_x all_displacement_storage_y
+    all_displacement_storage_x = [];
+    all_displacement_storage_y = [];
+    for i = 1:n
+        % Remove erroneous displacements that result from a particle striking the boundary
+        if boundary_collision(i) == 1 %only modify the displacement data if the given particle strikes the boundary
+            first_zero_idx_x = find(((histogram_data_x(i,:,j)==0)+([diff(histogram_data_x(i,:,j)) 0]==0))==2,1); %find the index of the two consecutive zeros in histogram_data for the given multiple of delta-t
+            histogram_data_x(i,(first_zero_idx_x-multiples_delta_time(j)):first_zero_idx_x-1,j) = 0; %remove the appropriate number of erroneous displacements
+            
+            first_zero_idx_y = find(((histogram_data_y(i,:,j)==0)+([diff(histogram_data_y(i,:,j)) 0]==0))==2,1); %find the index of the two consecutive zeros in histogram_data for the given multiple of delta-t
+            histogram_data_y(i,(first_zero_idx_y-multiples_delta_time(j)):first_zero_idx_y-1,j) = 0; %remove the appropriate number of erroneous displacements
         end
+        
+        all_displacement_storage_x = [all_displacement_storage_x no_trailing_zeros(histogram_data_x(i,:,j))];
+        all_displacement_storage_y = [all_displacement_storage_y no_trailing_zeros(histogram_data_y(i,:,j))];
     end
-end
 
-% Generate one histogram for each multiple of delta-t
-for i = 1:size(multiples_delta_time,2)
-    hist_plotting = histogram_data(:,:,i);
-    hist_plotting = reshape(hist_plotting,[1,numel(hist_plotting)]);
-    hist_plotting(hist_plotting==0) = [];
-    
-    figure()
-    histogram(hist_plotting, 'Normalization', 'probability')
+	figure()
+    histogram(all_displacement_storage_x, 'Normalization', 'pdf')
     title('Step Size Distribution')
-    xlabel('\Deltax, \Deltay [10^{-2}\mum]')
-    hist_y_label_str = strcat(['P(\Deltax, \Deltay, \Delta\tau=' num2str(multiples_delta_time(i)) ' time points)']);
+    xlabel('\Deltax [10^{-2}\mum]')
+    hist_y_label_str = strcat(['P(\Deltax, \Delta\tau=' num2str(multiples_delta_time(j)) ' time points)']);
     ylabel(hist_y_label_str)
     
+	figure()
+    histogram(all_displacement_storage_y, 'Normalization', 'pdf')
+    title('Step Size Distribution')
+    xlabel('\Deltay [10^{-2}\mum]')
+    hist_y_label_str = strcat(['P(\Deltay, \Delta\tau=' num2str(multiples_delta_time(j)) ' time points)']);
+    ylabel(hist_y_label_str)
 end
 
 %%% MSD(DELTA-T) %%%
@@ -306,31 +365,31 @@ for i = 1:n
 end
 
 % FIRST METHOD %
-% Remove trajectories that would break the MSD(delta-tau) curve
-while any(any(isnan(sdlt_plotting))) %loop as long as there are NaN values in the matrix
-    for i = 1:size(sdlt_plotting,1) %loop over the current size of the matrix (since rows may be removed, the matrix's size may change with each while loop iteration)
-        if any(isnan(sdlt_plotting(i,:)))
-            sdlt_plotting(i,:) = []; %remove rows (particle trajectories) that contain NaN values
-            break
-        end
-    end
-end
-
-% Set up the plot for the corresponding time-averaged MSD(delta-tau) curve
-msd_tau_plotting = mean(sdlt_plotting,1);
+% % Remove trajectories that would break the MSD(delta-tau) curve
+% while any(any(isnan(sdlt_plotting))) %loop as long as there are NaN values in the matrix
+%     for i = 1:size(sdlt_plotting,1) %loop over the current size of the matrix (since rows may be removed, the matrix's size may change with each while loop iteration)
+%         if any(isnan(sdlt_plotting(i,:)))
+%             sdlt_plotting(i,:) = []; %remove rows (particle trajectories) that contain NaN values
+%             break
+%         end
+%     end
+% end
+% 
+% % Set up the plot for the corresponding time-averaged MSD(delta-tau) curve
+% msd_tau_plotting = mean(sdlt_plotting,1);
 % FIRST METHOD
 
 % SECOND METHOD %
-% % Convert NaN values (resulting from entirely-zero walks) to zeros to avoid breaking the MSD(delta-tau) curve
-% sdlt_plotting(isnan(sdlt_plotting)) = 0;
-% 
-% % Set up the plot for the corresponding time-averaged MSD(delta-tau) curve
-% msd_tau_plotting = zeros(1,size(delta_taus,2));
-% for i = 1:size(delta_taus,2)
-%     sdlt_plotting_no_zeros = sdlt_plotting(:,i);
-%     sdlt_plotting_no_zeros(sdlt_plotting_no_zeros==0) = [];
-%     msd_tau_plotting(i) = mean(sdlt_plotting_no_zeros);
-% end
+% Convert NaN values (resulting from entirely-zero walks) to zeros to avoid breaking the MSD(delta-tau) curve
+sdlt_plotting(isnan(sdlt_plotting)) = 0;
+
+% Set up the plot for the corresponding time-averaged MSD(delta-tau) curve
+msd_tau_plotting = zeros(1,size(delta_taus,2));
+for i = 1:size(delta_taus,2)
+    sdlt_plotting_no_zeros = sdlt_plotting(:,i);
+    sdlt_plotting_no_zeros(sdlt_plotting_no_zeros==0) = [];
+    msd_tau_plotting(i) = mean(sdlt_plotting_no_zeros);
+end
 % SECOND METHOD %
 
 % Plot the corresponding time-averaged MSD(delta-tau) curve
@@ -338,3 +397,5 @@ plot(msd_tau_plotting,'LineWidth',2,'Color','red')
 title('Time-Averaged Squared Displacement vs. Lag Time')
 xlabel('Lag Time \Delta\tau [simulation time points]')
 ylabel('Time-Averaged MSD(\Delta\tau) [(10^{-2}\mum)^2]')
+
+toc
