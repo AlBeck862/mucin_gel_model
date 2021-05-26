@@ -108,12 +108,22 @@
 
 %%%%%
 
-test = [2,0,4,5,6,0,0,8,23,5,2,0,7,6,8,10,9,0,0,0,0,0,0,0,0,0,0,0];
-a = strfind(test,[0,0,0,0]);
-test(a(1):end) = [];
+% test = [2,0,4,5,6,0,0,8,23,5,2,0,7,6,8,10,9,0,0,0,0,0,0,0,0,0,0,0];
+% a = strfind(test,[0,0,0,0]);
+% test(a(1):end) = [];
 
+%%%%%
 
-
-
-
-
+% D = 1000000;
+% tau = 0.1;
+% 
+% % Define a sufficiently broad range of x values
+% x = linspace(-1125,1125,1250000);
+% 
+% % Define the PDF given the diffusivity and time step values
+% P = 1/(sqrt(4*pi*D*tau))*exp(-(x.^2/(4*D*tau)));
+% 
+% plot(x,P)
+% title('PDF')
+% xlabel('x')
+% ylabel('PDF')

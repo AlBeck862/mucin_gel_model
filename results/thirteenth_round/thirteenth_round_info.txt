@@ -1,0 +1,19 @@
+Lattice units: 10^-2 um scaling
+Number of walks: 5
+Time points (each particle): 5000
+Random start locations: yes
+histogram_1dt: normalized histogram of displacements for 1*delta-t
+histogram_5dt_dx: normalized histogram of x-direction displacements for 5*delta-t
+histogram_5dt_dy: normalized histogram of y-direction displacements for 5*delta-t
+histogram_10dt_dx: normalized histogram of x-direction displacements for 10*delta-t
+histogram_10dt_dy: normalized histogram of y-direction displacements for 10*delta-t
+histogram_50dt_x: normalized histogram of x-direction displacements for 50*delta-t
+histogram_50dt_y: normalized histogram of y-direction displacements for 50*delta-t
+histogram_100dt_x: normalized histogram of x-direction displacements for 100*delta-t
+histogram_100dt_y: normalized histogram of y-direction displacements for 100*delta-t
+msd_dt: squared displacement versus absolute time curves + MSD(dt) curve
+msd_dtau: squared displacement versus lag time curves + time-averaged MSD(dtau) curve
+
+Note: all walks used the corrected displacement-selection method
+Note: all histograms were generated using the new histogram plotting method
+Note: the spike around the origin in histogram_5dt_dx and histogram_5dt_dy is the result of the data processing method used to generate the histograms and is documented in the project's research notes (May 26, 2021)
