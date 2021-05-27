@@ -3,20 +3,20 @@ tic
 % Diffusion model
 % IMPORTANT NOTE: the x- and y-axis are reversed due to MATLAB row-column data storage convention
 
+global x all_cdf diffusivities
+
 %%% PARAMETERS %%%
 % Lattice parameters
 visualize_lattice = 1; %0: no visualization, 1: visualization
-save_lattice = 1; %0: don't save, 1: save (save the lattice to a .mat file if it is newly generated)
-heterogeneity = 0.5; %0: perfectly homogeneous, 1: maximal heterogeneity **CURRENTLY NOT USED
-lattice_x = 1e4;
-lattice_y = 1e4;
+save_lattice = 1; %0: don't save, 1: save (save the lattice to a .mat file if it is newly generated) --> used only if a lattice is generated
+heterogeneity = 0.5; %0: perfectly homogeneous, 1: maximal heterogeneity **CURRENTLY NOT USED --> used only if a lattice is generated
+lattice_x = 1e4; % --> used only if a lattice is generated
+lattice_y = 1e4; % --> used only if a lattice is generated
+tau = 0.1; %step unit (this must still be related back to time) --> used only if a lattice is generated
 
 % Simulation parameters
-tau = 0.1; %step unit (this must still be related back to time)
-% time = 500; %simulation time in seconds
-% time_pts = ceil(time/tau); %total time points
-time_pts = 5000; %total time points (absolute time, camera frame-rate)
-n = 5; %number of simulated particles.
+time_pts = 1000; %total time points (absolute time, camera frame-rate)
+n = 1; %number of simulated particles.
 random_start = 1; %0: all particles start at the center of the lattice, 1: particles are each assigned a random start location
 
 % Plotting parameters
@@ -25,13 +25,14 @@ multiples_delta_time = [5,10,50,100]; %additional time point intervals for displ
 %%% SET UP %%%
 % Fetch a lattice
 try
-    disp('Attempting to load a pre-existing lattice.')
+    disp('Attempting to load a pre-existing lattice and associated data.')
     load('lattice.mat','lattice')
-    disp('Lattice loaded from file.')
+    load('lattice_data.mat','x','all_cdf','diffusivities')
+    disp('Lattice and associated data loaded from file.')
 catch
     disp('No pre-existing lattice is available. Generating a new lattice.')
     tic %begin benchmarking
-    lattice = gen_lattice(save_lattice,heterogeneity,lattice_x,lattice_y);
+    [lattice,x,all_cdf,diffusivities] = gen_lattice(save_lattice,heterogeneity,lattice_x,lattice_y,tau);
     toc %end benchmarking
     disp('Lattice generated successfully.')
 end
@@ -45,9 +46,6 @@ end
 % Failsafe in case a loaded lattice's settings don't match those of the current lattice size
 lattice_x = size(lattice,2);
 lattice_y = size(lattice,1);
-
-% Convert true lattice diffusivity values to diffusivity values more appropriate for simulations
-adjusted_diffusivities = round(10000*lattice); %UNITS: 10^-4 um^2/s
 
 % Matrix to store all relevant simulation data
 data_matrix = zeros(n,time_pts,2); %for each particle at each time point, store the current x and y coordinates
@@ -107,7 +105,7 @@ for i = 1:n %iterate through each particle
     disp(disp_message_particle)
     for j = 2:time_pts %for each particle, iterate through each time point
         try
-            current_displacement_center = adjusted_diffusivities(data_matrix(i,j-1,1),data_matrix(i,j-1,2));
+            current_diffusivity = lattice(data_matrix(i,j-1,1),data_matrix(i,j-1,2));
         catch
             disp('WARNING. The particle struck the boundary and was rendered immobile.')
             data_matrix(i,j-1,1) = 0; %remove the displacement that crosses the boundary
@@ -116,9 +114,8 @@ for i = 1:n %iterate through each particle
             break
         end
         
-%         current_displacement = current_displacement_center + round(get_dispmnt_variation(current_displacement_center^2,tau));
-%         current_displacement_center = current_displacement_center^2;
-        current_displacement = round(get_dispmnt_variation(current_displacement_center,tau));
+        current_displacement = round(get_dispmnt_variation(current_diffusivity)); %randomly select a distance
+        
         direction_select = randi(4); %randomly select a direction
         
         if direction_select == 1 %+x (RIGHT)
