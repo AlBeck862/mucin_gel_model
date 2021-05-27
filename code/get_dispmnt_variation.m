@@ -19,6 +19,7 @@ while is_valid_x == 0
         is_valid_x = 1;
     end
 end
+
 % Define the return variable
 dispVar = displmnt;
 

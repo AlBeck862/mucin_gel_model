@@ -15,8 +15,8 @@ lattice_y = 1e4; % --> used only if a lattice is generated
 tau = 0.1; %step unit (this must still be related back to time) --> used only if a lattice is generated
 
 % Simulation parameters
-time_pts = 1000; %total time points (absolute time, camera frame-rate)
-n = 1; %number of simulated particles.
+time_pts = 5000; %total time points (absolute time, camera frame-rate)
+n = 25; %number of simulated particles.
 random_start = 1; %0: all particles start at the center of the lattice, 1: particles are each assigned a random start location
 
 % Plotting parameters
@@ -38,7 +38,12 @@ catch
 end
 
 if visualize_lattice == 1
-    lattice_visualization = rescale(lattice,0,1);
+    if length(unique(lattice)) == 1
+        lattice_visualization = rescale(lattice,1,1);
+    else
+        lattice_visualization = rescale(lattice,0,1);
+    end
+    
     lattice_visualization = fliplr(rot90(lattice_visualization,-1));
     imshow(lattice_visualization)
 end
@@ -140,8 +145,14 @@ end
 
 %%% WALK VISUALIZATION %%%
 % Plot the random walk of a single simulated particle
-lattice_visualization = rescale(lattice,0,1);
+if length(unique(lattice)) == 1
+    lattice_visualization = rescale(lattice,1,1);
+else
+    lattice_visualization = rescale(lattice,0,1);
+end
+
 lattice_visualization = fliplr(rot90(lattice_visualization,-1));
+
 for i = 1:n
     figure()
     imshow(lattice_visualization)
@@ -168,6 +179,7 @@ end
 clearvars all_displacement_storage
 all_displacement_storage = [];
 for i = 1:n
+    % Store the processed data for histogram plotting
     all_displacement_storage = [all_displacement_storage no_trailing_zeros(current_displacement_storage(i,:))];
 end
 
@@ -192,7 +204,7 @@ for dt = multiples_delta_time
 end
 
 for j = 1:size(multiples_delta_time,2)
-    clearvars all_displacement_storage_x all_displacement_storage_y
+    clearvars all_displacement_storage_x all_displacement_storage_y all_displacement_storage_both
     all_displacement_storage_x = [];
     all_displacement_storage_y = [];
     for i = 1:n
@@ -200,32 +212,66 @@ for j = 1:size(multiples_delta_time,2)
         if boundary_collision(i) == 1 %only modify the displacement data if the given particle strikes the boundary
             start_of_trailing_zeros = find(histogram_data_x(i,:,j),1,'last') + 1;
             try
-                histogram_data_x(i,(start_of_trailing_zeros-multiples_delta_time(j)):start_of_trailing_zeros-1,j) = 0; %remove the appropriate number of erroneous displacements
-                histogram_data_y(i,(start_of_trailing_zeros-multiples_delta_time(j)):start_of_trailing_zeros-1,j) = 0; %remove the appropriate number of erroneous displacements
+                % Remove the appropriate number of erroneous displacements
+                histogram_data_x(i,(start_of_trailing_zeros-multiples_delta_time(j)):start_of_trailing_zeros-1,j) = 0; 
+                histogram_data_y(i,(start_of_trailing_zeros-multiples_delta_time(j)):start_of_trailing_zeros-1,j) = 0;
             catch
+                % If the particle stopped so early that all displacements are erroneous, set the enter set of displacements to zero
                 histogram_data_x(i,:,j) = 0;
                 histogram_data_y(i,:,j) = 0;
             end
         end
         
-        all_displacement_storage_x = [all_displacement_storage_x no_trailing_zeros(histogram_data_x(i,:,j))];
-        all_displacement_storage_y = [all_displacement_storage_y no_trailing_zeros(histogram_data_y(i,:,j))];
+        % FIRST METHOD (FILTERING) %
+        current_histogram_data_x = histogram_data_x(i,:,j);
+        current_histogram_data_y = histogram_data_y(i,:,j);
+        
+        current_histogram_data_x_copy = histogram_data_x(i,:,j);
+        current_histogram_data_y_copy = histogram_data_y(i,:,j);
+
+        current_histogram_data_x((current_histogram_data_x_copy==0 & current_histogram_data_y_copy~=0)) = [];
+        current_histogram_data_y((current_histogram_data_y_copy==0 & current_histogram_data_x_copy~=0)) = [];
+        
+        current_histogram_data_x = no_trailing_zeros(current_histogram_data_x);
+        current_histogram_data_y = no_trailing_zeros(current_histogram_data_y);
+        
+        % Store the processed data for histogram plotting
+        all_displacement_storage_x = [all_displacement_storage_x current_histogram_data_x];
+        all_displacement_storage_y = [all_displacement_storage_y current_histogram_data_y];
+        % FIRST METHOD (FILTERING) %
+        
+        % SECOND METHOD (NO FILTERING) %
+        % Store the processed data for histogram plotting
+%         all_displacement_storage_x = [all_displacement_storage_x no_trailing_zeros(histogram_data_x(i,:,j))];
+%         all_displacement_storage_y = [all_displacement_storage_y no_trailing_zeros(histogram_data_y(i,:,j))];
+        % SECOND METHOD (NO FILTERING) %
         
     end
     
-	figure()
-    histogram(all_displacement_storage_x, 'Normalization', 'pdf')
-    title('Step Size Distribution')
-    xlabel('\Deltax [10^{-2}\mum]')
-    hist_y_label_str = strcat(['P(\Deltax, \Delta\tau=' num2str(multiples_delta_time(j)) ' time points)']);
-    ylabel(hist_y_label_str)
+    % Combine the direction-specific data for histogram plotting
+    all_displacement_storage_both = [all_displacement_storage_x all_displacement_storage_y];
     
+%     figure()
+%     histogram(all_displacement_storage_x, 'Normalization', 'pdf')
+%     title('Step Size Distribution')
+%     xlabel('\Deltax [10^{-2}\mum]')
+%     hist_y_label_str = strcat(['P(\Deltax, \Delta\tau=' num2str(multiples_delta_time(j)) ' time points)']);
+%     ylabel(hist_y_label_str)
+%     
+%     figure()
+%     histogram(all_displacement_storage_y, 'Normalization', 'pdf')
+%     title('Step Size Distribution')
+%     xlabel('\Deltay [10^{-2}\mum]')
+%     hist_y_label_str = strcat(['P(\Deltay, \Delta\tau=' num2str(multiples_delta_time(j)) ' time points)']);
+%     ylabel(hist_y_label_str)
+
 	figure()
-    histogram(all_displacement_storage_y, 'Normalization', 'pdf')
+    histogram(all_displacement_storage_both, 'Normalization', 'pdf')
     title('Step Size Distribution')
-    xlabel('\Deltay [10^{-2}\mum]')
-    hist_y_label_str = strcat(['P(\Deltay, \Delta\tau=' num2str(multiples_delta_time(j)) ' time points)']);
+    xlabel('\Deltax, \Deltay [10^{-2}\mum]')
+    hist_y_label_str = strcat(['P(\Deltax, \Deltay, \Delta\tau=' num2str(multiples_delta_time(j)) ' time points)']);
     ylabel(hist_y_label_str)
+
 end
 
 %%% MSD(DELTA-T) %%%

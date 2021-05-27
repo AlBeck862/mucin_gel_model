@@ -8,6 +8,10 @@ function [lattice,x,all_cdf,diffusivities] = gen_lattice(save_lattice,heterogene
 % Define the lattice
 lattice_area = lattice_size_x * lattice_size_y;
 
+% Used only to generate a single-diffusivity lattice
+% lattice = 10000*ones(lattice_size_x,lattice_size_y);
+% diffusivities = 10000;
+
 % Initialize a void lattice
 lattice = zeros(lattice_size_x,lattice_size_y);
 
@@ -19,16 +23,17 @@ num_regions = 8;
 min_diffusivity = 0.1; %um^2/s
 max_diffusivity = 1.25; %um^2/s
 
-%Adjust the units of the diffusivities
+% Adjust the units of the diffusivities
 multiplier = 10000;
 min_diffusivity = multiplier*min_diffusivity; %10^-4 um^2/s
 max_diffusivity = multiplier*max_diffusivity; %10^-4 um^2/s
 
+% Compute the diffusivities of the lattice's subregions
 % diffusivities = min_diffusivity + (max_diffusivity-min_diffusivity).*rand(1,num_regions);
 diffusivities = round(linspace(min_diffusivity,max_diffusivity,num_regions)); % ** MANUALLY FORCED HETEROGENEITY
 
 % Generate the CDF corresponding to each diffusivity value in the lattice
-x = linspace(-200,200,2000000);
+x = linspace(-165,165,1650000);
 all_cdf = zeros(length(diffusivities),length(x));
 for i = 1:length(diffusivities)
     all_cdf(i,:) = gen_PDF(diffusivities(i),tau,x);

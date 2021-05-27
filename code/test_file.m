@@ -205,10 +205,103 @@
 % 
 % tau = 0.1;
 %  
-% x = linspace(-200,200,2000000);
+% x = linspace(-165,165,1650000);
 % all_cdf = zeros(length(diffusivities),length(x));
 % for i = 1:length(diffusivities)
 %     all_cdf(i,:) = gen_PDF(diffusivities(i),tau,x);
 % end
+% 
+% all_cdf(:,end)
 
 %%%%%
+
+%%% HISTOGRAMS %%%
+% Histogram for all displacements (1*(delta-t))
+clearvars all_displacement_storage
+all_displacement_storage = [];
+for i = 1:n
+    % Store the processed data for histogram plotting
+    all_displacement_storage = [all_displacement_storage no_trailing_zeros(current_displacement_storage(i,:))];
+end
+
+figure()
+histogram(all_displacement_storage, 'Normalization', 'pdf')
+title('Step Size Distribution')
+xlabel('\Deltax, \Deltay [10^{-2}\mum]')
+ylabel('P(\Deltax, \Deltay, \Delta\tau=1 time point)')
+
+% Histograms for displacements using greater multiples of delta-t (iteratively: multiples_delta_time*(delta-t))
+histogram_data_x = zeros(n,time_pts,size(multiples_delta_time,2));
+histogram_data_y = zeros(n,time_pts,size(multiples_delta_time,2));
+counter_hist = 1;
+for dt = multiples_delta_time
+    for i = 1:n
+        for j = 1:time_pts-dt
+            histogram_data_x(i,j,counter_hist) = data_matrix(i,j+dt,1) - data_matrix(i,j,1);
+            histogram_data_y(i,j,counter_hist) = data_matrix(i,j+dt,2) - data_matrix(i,j,2);
+        end
+    end
+    counter_hist = counter_hist + 1;
+end
+
+for j = 1:size(multiples_delta_time,2)
+    clearvars all_displacement_storage_x all_displacement_storage_y all_displacement_storage_both
+    clearvars current_histogram_data_x current_histogram_data_y current_histogram_data_x_copy current_histogram_data_y_copy
+    all_displacement_storage_x = [];
+    all_displacement_storage_y = [];
+    for i = 1:n
+        % Remove erroneous displacements that result from a particle striking the boundary
+        if boundary_collision(i) == 1 %only modify the displacement data if the given particle strikes the boundary
+            start_of_trailing_zeros = find(histogram_data_x(i,:,j),1,'last') + 1;
+            try
+                % Remove the appropriate number of erroneous displacements
+                histogram_data_x(i,(start_of_trailing_zeros-multiples_delta_time(j)):start_of_trailing_zeros-1,j) = 0; 
+                histogram_data_y(i,(start_of_trailing_zeros-multiples_delta_time(j)):start_of_trailing_zeros-1,j) = 0;
+            catch
+                % If the particle stopped so early that all displacements are erroneous, set the enter set of displacements to zero
+                histogram_data_x(i,:,j) = 0;
+                histogram_data_y(i,:,j) = 0;
+            end
+        end
+        
+        current_histogram_data_x = no_trailing_zeros(histogram_data_x(i,:,j));
+        current_histogram_data_y = no_trailing_zeros(histogram_data_y(i,:,j));
+        
+        current_histogram_data_x_copy = no_trailing_zeros(histogram_data_x(i,:,j));
+        current_histogram_data_y_copy = no_trailing_zeros(histogram_data_y(i,:,j));
+        
+%         idxs_zeros_x = find(~current_histogram_data_x);
+%         idxs_zeros_y = find(~current_histogram_data_y);
+        
+        current_histogram_data_x((current_histogram_data_x_copy==0 & current_histogram_data_y_copy~=0)) = [];
+        current_histogram_data_y((current_histogram_data_y_copy==0 & current_histogram_data_x_copy~=0)) = [];
+        
+        % Store the processed data for histogram plotting
+        all_displacement_storage_x = [all_displacement_storage_x current_histogram_data_x];
+        all_displacement_storage_y = [all_displacement_storage_y current_histogram_data_y];
+        
+    end
+    
+    all_displacement_storage_both = [all_displacement_storage_x all_displacement_storage_y];
+    
+%     figure()
+%     histogram(all_displacement_storage_x, 'Normalization', 'pdf')
+%     title('Step Size Distribution')
+%     xlabel('\Deltax [10^{-2}\mum]')
+%     hist_y_label_str = strcat(['P(\Deltax, \Delta\tau=' num2str(multiples_delta_time(j)) ' time points)']);
+%     ylabel(hist_y_label_str)
+%     
+%     figure()
+%     histogram(all_displacement_storage_y, 'Normalization', 'pdf')
+%     title('Step Size Distribution')
+%     xlabel('\Deltay [10^{-2}\mum]')
+%     hist_y_label_str = strcat(['P(\Deltay, \Delta\tau=' num2str(multiples_delta_time(j)) ' time points)']);
+%     ylabel(hist_y_label_str)
+
+	figure()
+    histogram(all_displacement_storage_both, 'Normalization', 'pdf')
+    title('Step Size Distribution')
+    xlabel('\Deltax, \Deltay [10^{-2}\mum]')
+    hist_y_label_str = strcat(['P(\Deltax, \Deltay, \Delta\tau=' num2str(multiples_delta_time(j)) ' time points)']);
+    ylabel(hist_y_label_str)
+end
