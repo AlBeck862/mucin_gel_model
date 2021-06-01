@@ -1,4 +1,4 @@
-tic
+tic %begin benchmarking
 
 % Diffusion model
 % IMPORTANT NOTE: the x- and y-axis are reversed due to MATLAB row-column data storage convention
@@ -16,7 +16,7 @@ tau = 0.1; %step unit (this must still be related back to time) --> used only if
 
 % Simulation parameters
 time_pts = 5000; %total time points (absolute time, camera frame-rate)
-n = 25; %number of simulated particles.
+n = 10; %number of simulated particles.
 random_start = 1; %0: all particles start at the center of the lattice, 1: particles are each assigned a random start location
 
 % Plotting parameters
@@ -176,18 +176,30 @@ end
 
 %%% HISTOGRAMS %%%
 % Histogram for all displacements (1*(delta-t))
-clearvars all_displacement_storage
+clearvars all_displacement_storage eval_vals hist_obj fit_data_pdf
 all_displacement_storage = [];
 for i = 1:n
     % Store the processed data for histogram plotting
     all_displacement_storage = [all_displacement_storage no_trailing_zeros(current_displacement_storage(i,:))];
 end
 
+% Plot the histogram
 figure()
-histogram(all_displacement_storage, 'Normalization', 'pdf')
+hist_obj = histogram(all_displacement_storage, 'Normalization', 'pdf');
+fit_data = fitdist(all_displacement_storage','Normal'); %obtain fit data
+
+% fit_data = fitdist(all_displacement_storage','Logistic')
+% fit_data = fitdist(all_displacement_storage','Stable')
+
+eval_vals = (hist_obj.BinEdges(1)-20:0.1:hist_obj.BinEdges(end)+20);
+fit_data_pdf = pdf(fit_data,eval_vals); %compute the corresponding PDF
+hold on
+plot(eval_vals,fit_data_pdf,'LineWidth',2) %overlay the PDF on top of the histogram
 title('Step Size Distribution')
 xlabel('\Deltax, \Deltay [10^{-2}\mum]')
 ylabel('P(\Deltax, \Deltay, \Delta\tau=1 time point)')
+fit_legend = strcat(['Mean = ' num2str(fit_data.mu) ', Std. Dev. = ' num2str(fit_data.sigma)]);
+legend('Distribution',fit_legend)
 
 % Histograms for displacements using greater multiples of delta-t (iteratively: multiples_delta_time*(delta-t))
 histogram_data_x = zeros(n,time_pts,size(multiples_delta_time,2));
@@ -204,7 +216,7 @@ for dt = multiples_delta_time
 end
 
 for j = 1:size(multiples_delta_time,2)
-    clearvars all_displacement_storage_x all_displacement_storage_y all_displacement_storage_both
+    clearvars all_displacement_storage_x all_displacement_storage_y all_displacement_storage_both eval_vals hist_obj fit_data_pdf
     all_displacement_storage_x = [];
     all_displacement_storage_y = [];
     for i = 1:n
@@ -266,12 +278,24 @@ for j = 1:size(multiples_delta_time,2)
 %     ylabel(hist_y_label_str)
 
 	figure()
-    histogram(all_displacement_storage_both, 'Normalization', 'pdf')
+    hist_obj = histogram(all_displacement_storage_both, 'Normalization', 'pdf');
+    fit_data = fitdist(all_displacement_storage_both','Normal'); %obtain fit data
+    
+%     fit_data = fitdist(all_displacement_storage_both','Logistic')
+%     fit_data = fitdist(all_displacement_storage_both','Stable')
+    
+    eval_vals = (hist_obj.BinEdges(1)-20:0.1:hist_obj.BinEdges(end)+20);
+    fit_data_pdf = pdf(fit_data,eval_vals); %compute the corresponding PDF
+    hold on
+    plot(eval_vals,fit_data_pdf,'LineWidth',2) %overlay the PDF on top of the histogram
+    
     title('Step Size Distribution')
     xlabel('\Deltax, \Deltay [10^{-2}\mum]')
     hist_y_label_str = strcat(['P(\Deltax, \Deltay, \Delta\tau=' num2str(multiples_delta_time(j)) ' time points)']);
     ylabel(hist_y_label_str)
-
+    fit_legend = strcat(['Mean = ' num2str(fit_data.mu) ', Std. Dev. = ' num2str(fit_data.sigma)]);
+    legend('Distribution',fit_legend)
+    
 end
 
 %%% MSD(DELTA-T) %%%
@@ -401,4 +425,4 @@ title('Time-Averaged Squared Displacement vs. Lag Time')
 xlabel('Lag Time \Delta\tau [simulation time points]')
 ylabel('Time-Averaged MSD(\Delta\tau) [(10^{-2}\mum)^2]')
 
-toc
+toc %end benchmarking
