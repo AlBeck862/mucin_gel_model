@@ -186,10 +186,10 @@ end
 % Plot the histogram
 figure()
 hist_obj = histogram(all_displacement_storage, 'Normalization', 'pdf');
-fit_data = fitdist(all_displacement_storage','Normal'); %obtain fit data
+% fit_data = fitdist(all_displacement_storage','Normal'); %obtain fit data
 
-% fit_data = fitdist(all_displacement_storage','Logistic')
-% fit_data = fitdist(all_displacement_storage','Stable')
+% fit_data = fitdist(all_displacement_storage','Logistic');
+fit_data = fitdist(all_displacement_storage','Stable');
 
 eval_vals = (hist_obj.BinEdges(1)-20:0.1:hist_obj.BinEdges(end)+20);
 fit_data_pdf = pdf(fit_data,eval_vals); %compute the corresponding PDF
@@ -198,8 +198,8 @@ plot(eval_vals,fit_data_pdf,'LineWidth',2) %overlay the PDF on top of the histog
 title('Step Size Distribution')
 xlabel('\Deltax, \Deltay [10^{-2}\mum]')
 ylabel('P(\Deltax, \Deltay, \Delta\tau=1 time point)')
-fit_legend = strcat(['Mean = ' num2str(fit_data.mu) ', Std. Dev. = ' num2str(fit_data.sigma)]);
-legend('Distribution',fit_legend)
+% fit_legend = strcat(['Mean = ' num2str(fit_data.mu) ', Std. Dev. = ' num2str(fit_data.sigma)]);
+% legend('Distribution',fit_legend)
 
 % Histograms for displacements using greater multiples of delta-t (iteratively: multiples_delta_time*(delta-t))
 histogram_data_x = zeros(n,time_pts,size(multiples_delta_time,2));
@@ -279,10 +279,10 @@ for j = 1:size(multiples_delta_time,2)
 
 	figure()
     hist_obj = histogram(all_displacement_storage_both, 'Normalization', 'pdf');
-    fit_data = fitdist(all_displacement_storage_both','Normal'); %obtain fit data
+%     fit_data = fitdist(all_displacement_storage_both','Normal'); %obtain fit data
     
-%     fit_data = fitdist(all_displacement_storage_both','Logistic')
-%     fit_data = fitdist(all_displacement_storage_both','Stable')
+%     fit_data = fitdist(all_displacement_storage_both','Logistic');
+    fit_data = fitdist(all_displacement_storage_both','Stable');
     
     eval_vals = (hist_obj.BinEdges(1)-20:0.1:hist_obj.BinEdges(end)+20);
     fit_data_pdf = pdf(fit_data,eval_vals); %compute the corresponding PDF
@@ -293,10 +293,123 @@ for j = 1:size(multiples_delta_time,2)
     xlabel('\Deltax, \Deltay [10^{-2}\mum]')
     hist_y_label_str = strcat(['P(\Deltax, \Deltay, \Delta\tau=' num2str(multiples_delta_time(j)) ' time points)']);
     ylabel(hist_y_label_str)
-    fit_legend = strcat(['Mean = ' num2str(fit_data.mu) ', Std. Dev. = ' num2str(fit_data.sigma)]);
-    legend('Distribution',fit_legend)
+%     fit_legend = strcat(['Mean = ' num2str(fit_data.mu) ', Std. Dev. = ' num2str(fit_data.sigma)]);
+%     legend('Distribution',fit_legend)
     
 end
+
+% FOR TESTING %
+
+% Histograms for displacements using greater multiples of delta-t (iteratively: multiples_delta_time*(delta-t))
+% histogram_data = zeros(n,time_pts,size(multiples_delta_time,2));
+% new_data_matrix = data_matrix;
+% counter_hist = 1;
+% for dt = multiples_delta_time
+%     for i = 1:n
+%         % Remove erroneous displacements that result from a particle striking the boundary
+%         if boundary_collision(i) == 1 %only modify the displacement data if the given particle strikes the boundary
+%             start_of_trailing_zeros = find(new_data_matrix(i,:,1),1,'last') + 1;
+%             try
+%                 % Remove the appropriate number of erroneous displacements
+%                 new_data_matrix(i,(start_of_trailing_zeros-multiples_delta_time(j)):start_of_trailing_zeros-1,j) = 0; 
+%             catch
+%                 % If the particle stopped so early that all displacements are erroneous, set the enter set of displacements to zero
+%                 new_data_matrix(i,:,j) = 0;
+%             end
+%         end
+%         for j = 1:time_pts-dt
+%             delta_x = new_data_matrix(i,j+dt,1) - new_data_matrix(i,j,1);
+%             delta_y = new_data_matrix(i,j+dt,2) - new_data_matrix(i,j,2);
+%             
+%             if delta_x > 0
+%                 histogram_data(i,j,counter_hist) = sqrt((delta_x)^2 + (delta_y)^2);
+%             else
+%                 histogram_data(i,j,counter_hist) = -sqrt((delta_x)^2 + (delta_y)^2);
+%             end
+%         end
+%     end
+%     counter_hist = counter_hist + 1;
+% end
+% 
+% for j = 1:size(multiples_delta_time,2)
+%     clearvars all_displacement_storage eval_vals hist_obj fit_data_pdf
+%     all_displacement_storage = [];
+%     for i = 1:n
+% %         % Remove erroneous displacements that result from a particle striking the boundary
+% %         if boundary_collision(i) == 1 %only modify the displacement data if the given particle strikes the boundary
+% %             start_of_trailing_zeros = find(histogram_data(i,:,j),1,'last') + 1;
+% %             try
+% %                 % Remove the appropriate number of erroneous displacements
+% %                 histogram_data(i,(start_of_trailing_zeros-multiples_delta_time(j)):start_of_trailing_zeros-1,j) = 0; 
+% %             catch
+% %                 % If the particle stopped so early that all displacements are erroneous, set the enter set of displacements to zero
+% %                 histogram_data(i,:,j) = 0;
+% %             end
+% %         end
+%         
+%         % FIRST METHOD (FILTERING) %
+% %         current_histogram_data_x = histogram_data_x(i,:,j);
+% %         current_histogram_data_y = histogram_data_y(i,:,j);
+% %         
+% %         current_histogram_data_x_copy = histogram_data_x(i,:,j);
+% %         current_histogram_data_y_copy = histogram_data_y(i,:,j);
+% % 
+% %         current_histogram_data_x((current_histogram_data_x_copy==0 & current_histogram_data_y_copy~=0)) = [];
+% %         current_histogram_data_y((current_histogram_data_y_copy==0 & current_histogram_data_x_copy~=0)) = [];
+%         
+%         current_histogram_data = no_trailing_zeros(histogram_data(i,:,j));
+%         
+%         % Store the processed data for histogram plotting
+%         all_displacement_storage = [all_displacement_storage current_histogram_data(current_histogram_data>-1500 & current_histogram_data<1500)];
+%         % FIRST METHOD (FILTERING) %
+%         
+%         % SECOND METHOD (NO FILTERING) %
+%         % Store the processed data for histogram plotting
+% %         all_displacement_storage_x = [all_displacement_storage_x no_trailing_zeros(histogram_data_x(i,:,j))];
+% %         all_displacement_storage_y = [all_displacement_storage_y no_trailing_zeros(histogram_data_y(i,:,j))];
+%         % SECOND METHOD (NO FILTERING) %
+%         
+%     end
+%     
+%     % Combine the direction-specific data for histogram plotting
+% %     all_displacement_storage_both = [all_displacement_storage_x all_displacement_storage_y];
+%     
+% %     figure()
+% %     histogram(all_displacement_storage_x, 'Normalization', 'pdf')
+% %     title('Step Size Distribution')
+% %     xlabel('\Deltax [10^{-2}\mum]')
+% %     hist_y_label_str = strcat(['P(\Deltax, \Delta\tau=' num2str(multiples_delta_time(j)) ' time points)']);
+% %     ylabel(hist_y_label_str)
+% %     
+% %     figure()
+% %     histogram(all_displacement_storage_y, 'Normalization', 'pdf')
+% %     title('Step Size Distribution')
+% %     xlabel('\Deltay [10^{-2}\mum]')
+% %     hist_y_label_str = strcat(['P(\Deltay, \Delta\tau=' num2str(multiples_delta_time(j)) ' time points)']);
+% %     ylabel(hist_y_label_str)
+% 
+% 	figure()
+%     hist_obj = histogram(all_displacement_storage, 'Normalization', 'pdf');
+%     fit_data = fitdist(all_displacement_storage','Normal'); %obtain fit data
+%     
+% %     fit_data = fitdist(all_displacement_storage_both','Logistic')
+% %     fit_data = fitdist(all_displacement_storage_both','Stable')
+%     
+%     eval_vals = (hist_obj.BinEdges(1)-20:0.1:hist_obj.BinEdges(end)+20);
+%     fit_data_pdf = pdf(fit_data,eval_vals); %compute the corresponding PDF
+%     hold on
+%     plot(eval_vals,fit_data_pdf,'LineWidth',2) %overlay the PDF on top of the histogram
+%     
+%     title('Step Size Distribution')
+%     xlabel('\Deltax, \Deltay [10^{-2}\mum]')
+%     hist_y_label_str = strcat(['P(\Deltax, \Deltay, \Delta\tau=' num2str(multiples_delta_time(j)) ' time points)']);
+%     ylabel(hist_y_label_str)
+%     fit_legend = strcat(['Mean = ' num2str(fit_data.mu) ', Std. Dev. = ' num2str(fit_data.sigma)]);
+%     legend('Distribution',fit_legend)
+%     
+% end
+
+% FOR TESTING %
 
 %%% MSD(DELTA-T) %%%
 % MSD(delta-t) plot
