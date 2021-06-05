@@ -322,31 +322,50 @@
 
 %%%%%
 
-try
-    delete(pool)
-end
-num = 2; %number of total iterations
-workers = 3; %number of cores
-pool = parpool(workers);
-result = zeros(1,num);
+% try
+%     delete(pool)
+% end
+% num = 2; %number of total iterations
+% workers = 3; %number of cores
+% pool = parpool(workers);
+% result = zeros(1,num);
+% 
+% for round = 1:ceil(num/workers)
+%     if round*workers<=num
+%         val = workers;
+%         spmd (val)
+%             a = round*labindex;
+%         end
+%     else
+%         val = rem(num,workers);
+%         spmd (val)
+%             a = round*labindex;
+%         end
+%     end
+%     
+% %     [a{:}]
+%     idx = find(~result,1,'first');
+%     result(idx:idx+val-1) = [a{:}];
+%     clear a
+%     
+% end
 
-for round = 1:ceil(num/workers)
-    if round*workers<=num
-        val = workers;
-        spmd (val)
-            a = round*labindex;
-        end
-    else
-        val = rem(num,workers);
-        spmd (val)
-            a = round*labindex;
-        end
-    end
-    
-%     [a{:}]
-    idx = find(~result,1,'first');
-    result(idx:idx+val-1) = [a{:}];
-    clear a
-    
-end
+%%%%%
+
+time_idx = [1,2,3,4,5,10,50,100,125,150,175,200];
+data_10000 = [0.996,0.8192,0.7588,0.7343,0.723,0.713,0.712,0.71,0.714,0.718,0.723,0.726];
+data_2500 = [0.992,0.822,0.762,0.736,0.723,0.711,0.718,0.707,0.702,0.699,0.696,0.692];
+
+plot(time_idx,data_10000,'-o')
+hold on
+plot(time_idx,data_2500,'-o')
+legend('D=10000','D=2500')
+xlabel('# time points')
+ylabel('Histogram std. dev. / Theoretical std. dev.')
+
+
+
+
+
+
 

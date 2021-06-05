@@ -9,8 +9,8 @@ function [lattice,x,all_cdf,diffusivities] = gen_lattice(save_lattice,heterogene
 lattice_area = lattice_size_x * lattice_size_y;
 
 % Used only to generate a single-diffusivity lattice
-% lattice = 10000*ones(lattice_size_x,lattice_size_y);
-% diffusivities = 10000;
+% lattice = 2500*ones(lattice_size_x,lattice_size_y);
+% diffusivities = 2500;
 
 % Initialize a void lattice
 lattice = zeros(lattice_size_x,lattice_size_y);
