@@ -355,17 +355,94 @@
 time_idx = [1,2,3,4,5,10,50,100,125,150,175,200];
 data_10000 = [0.996,0.8192,0.7588,0.7343,0.723,0.713,0.712,0.71,0.714,0.718,0.723,0.726];
 data_2500 = [0.992,0.822,0.762,0.736,0.723,0.711,0.718,0.707,0.702,0.699,0.696,0.692];
+data_2500_again = [0.996,0.823,0.764,0.739,0.726,0.714,0.716,0.718,0.724,0.727,0.728,0.729];
 
-plot(time_idx,data_10000,'-o')
+raw_theory_10000 = [44.72,63.25,77.46,89.44,100.00,141.42,316.23,447.21,500,547.72,591.61,632.46];
+raw_theory_2500 = [22.36,31.62,38.73,44.72,50.00,70.71,158.11,223.61,250.00,273.86,295.80,316.23];
+raw_10000 = [44.54,51.82,58.78,65.68,72.26,100.90,225.14,317.58,356.79,393.52,427.60,459.20];
+raw_2500 = [22.19,25.98,29.53,32.90,36.17,50.27,113.49,158.01,175.46,191.38,205.89,218.82];
+raw_2500_again = [22.26,26.02,29.59,33.05,36.31,50.50,113.23,160.59,180.91,199.02,215.38,230.49];
+
+raw_2500_again_again = [15.816,22.3997,27.4605,31.7248,35.4858,50.3993,115.0598,163.575,182.434,199.6032,215.3026,229.548];
+
+% Unchanged
+% figure()
+% plot(time_idx,data_10000,'-o')
+% hold on
+% plot(time_idx,data_2500,'-o')
+% plot(time_idx,data_2500_again,'-o')
+% legend('D=10000','D=2500','D=2500 again')
+% xlabel('# time points')
+% ylabel('Histogram std. dev. / Theoretical std. dev.')
+% 
+% figure()
+% plot(time_idx,raw_theory_10000,'--')
+% hold on
+% plot(time_idx,raw_theory_2500,'--')
+% plot(time_idx,raw_10000,'-o')
+% plot(time_idx,raw_2500,'-o')
+% plot(time_idx,raw_2500_again,'-o')
+% plot(time_idx,raw_2500_again_again,'-o')
+% legend('Theory D=10000','Theory D=2500','D=10000','D=2500','D=2500 again','D=2500 again again')
+% xlabel('# time points')
+% ylabel('Std. Deviation')
+% 
+% figure()
+% plot(raw_theory_10000,raw_10000,'-o')
+% hold on
+% plot(raw_theory_2500,raw_2500,'-o')
+% plot(raw_theory_2500,raw_2500_again,'-o')
+% plot(raw_theory_2500,raw_2500_again_again,'-o')
+% plot(1:500,'--')
+% legend('D=10000','D=2500','D=2500 again','D=2500 again again','Perfect Agreement')
+% xlabel('Theoretical Std. Dev.')
+% ylabel('Experimental Std. Dev.')
+
+
+% New test
+raw_2500_first_method = [22.2205,26.0039,29.5289,32.9218,36.1586,50.1428,111.8225,154.4281,171.5639,187.2045,201.7564,214.9222];
+raw_2500_second_method = [15.8517,22.4354,27.4623,31.6767,35.3775,49.9109,111.6039,154.251,171.3927,186.9898,201.5469,214.7159];
+raw_2500_third_method = [15.8481,22.4294,27.4527,31.6631,35.3591,49.861,111.0449,152.7034,169.2417,184.1718,198.0009,210.3952];
+
+figure()
+plot(raw_theory_2500,raw_2500_first_method,'-o')
 hold on
-plot(time_idx,data_2500,'-o')
-legend('D=10000','D=2500')
-xlabel('# time points')
-ylabel('Histogram std. dev. / Theoretical std. dev.')
+plot(raw_theory_2500,raw_2500_second_method,'-o')
+plot(raw_theory_2500,raw_2500_third_method,'-o')
+plot(1:500,'--')
+legend('First Method','Second Method','Third Method','Perfect Agreement')
+xlabel('Theoretical Std. Dev.')
+ylabel('Experimental Std. Dev.')
 
+fit_line = polyfit(raw_theory_2500,raw_2500_third_method,1)
+quotients = raw_2500_third_method./raw_theory_2500
+avg_quotient = mean(quotients)
 
+% Squared
+% figure()
+% plot(time_idx,raw_theory_10000.^2,'--')
+% hold on
+% plot(time_idx,raw_theory_2500.^2,'--')
+% plot(time_idx,raw_10000.^2,'-o')
+% plot(time_idx,raw_2500.^2,'-o')
+% plot(time_idx,raw_2500_again.^2,'-o')
+% legend('Theory D=10000','Theory D=2500','D=10000','D=2500','D=2500 again')
+% xlabel('# time points')
+% ylabel('Std. Deviation')
+% 
+% figure()
+% plot(raw_theory_10000.^2,raw_10000.^2,'-o')
+% hold on
+% plot(raw_theory_2500.^2,raw_2500.^2,'-o')
+% plot(raw_theory_2500.^2,raw_2500_again.^2,'-o')
+% plot(1:500000,'--')
+% legend('D=10000','D=2500','D=2500 again','Perfect Agreement')
+% xlabel('Theoretical Std. Dev.')
+% ylabel('Experimental Std. Dev.')
 
-
-
-
+% Fitting
+% sqrt_fit_raw_theory_10000 = polyfit(sqrt(time_idx),raw_theory_10000,1)
+% sqrt_fit_raw_10000 = polyfit(sqrt(time_idx),raw_10000,1)
+% 
+% fit_raw_10000 = polyfit(raw_theory_10000.^2,raw_10000.^2,1)
 

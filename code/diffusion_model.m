@@ -12,12 +12,12 @@ save_lattice = 1; %0: don't save, 1: save (save the lattice to a .mat file if it
 heterogeneity = 0.5; %0: perfectly homogeneous, 1: maximal heterogeneity **CURRENTLY NOT USED --> used only if a lattice is generated
 lattice_x = 1e4; % --> used only if a lattice is generated
 lattice_y = 1e4; % --> used only if a lattice is generated
-tau = 0.1; %step unit (this must still be related back to time) --> used only if a lattice is generated
+conversion_factor = 0.1; %conversion factor, units of seconds per time point
 
 % Simulation parameters
 time_pts = 5000; %total time points (absolute time, camera frame-rate)
 n = 10; %number of simulated particles.
-random_start = 1; %0: all particles start at the center of the lattice, 1: particles are each assigned a random start location
+random_start = 0; %0: all particles start at the center of the lattice, 1: particles are each assigned a random start location, -1: all particles start a hard-coded location
 
 % Plotting parameters
 multiples_delta_time = [1,2,3,4,5,10,50,100,125,150,175,200]; %additional time point intervals for displacement histogram generation (each value corresponds to a histogram)
@@ -32,7 +32,7 @@ try
 catch
     disp('No pre-existing lattice is available. Generating a new lattice.')
     tic %begin benchmarking
-    [lattice,x,all_cdf,diffusivities] = gen_lattice(save_lattice,heterogeneity,lattice_x,lattice_y,tau);
+    [lattice,x,all_cdf,diffusivities] = gen_lattice(save_lattice,heterogeneity,lattice_x,lattice_y,conversion_factor);
     toc %end benchmarking
     disp('Lattice generated successfully.')
 end
@@ -221,35 +221,35 @@ for j = 1:size(multiples_delta_time,2)
     all_displacement_storage_y = [];
     for i = 1:n
         % Remove erroneous displacements that result from a particle striking the boundary
-        if boundary_collision(i) == 1 %only modify the displacement data if the given particle strikes the boundary
-            start_of_trailing_zeros = find(histogram_data_x(i,:,j),1,'last') + 1;
-            try
-                % Remove the appropriate number of erroneous displacements
-                histogram_data_x(i,(start_of_trailing_zeros-multiples_delta_time(j)):start_of_trailing_zeros-1,j) = 0; 
-                histogram_data_y(i,(start_of_trailing_zeros-multiples_delta_time(j)):start_of_trailing_zeros-1,j) = 0;
-            catch
-                % If the particle stopped so early that all displacements are erroneous, set the enter set of displacements to zero
-                histogram_data_x(i,:,j) = 0;
-                histogram_data_y(i,:,j) = 0;
-            end
-        end
+%         if boundary_collision(i) == 1 %only modify the displacement data if the given particle strikes the boundary
+%             start_of_trailing_zeros = find(histogram_data_x(i,:,j),1,'last') + 1;
+%             try
+%                 % Remove the appropriate number of erroneous displacements
+%                 histogram_data_x(i,(start_of_trailing_zeros-multiples_delta_time(j)):start_of_trailing_zeros-1,j) = 0; 
+%                 histogram_data_y(i,(start_of_trailing_zeros-multiples_delta_time(j)):start_of_trailing_zeros-1,j) = 0;
+%             catch
+%                 % If the particle stopped so early that all displacements are erroneous, set the enter set of displacements to zero
+%                 histogram_data_x(i,:,j) = 0;
+%                 histogram_data_y(i,:,j) = 0;
+%             end
+%         end
         
         % FIRST METHOD (FILTERING) %
-        current_histogram_data_x = histogram_data_x(i,:,j);
-        current_histogram_data_y = histogram_data_y(i,:,j);
-        
-        current_histogram_data_x_copy = histogram_data_x(i,:,j);
-        current_histogram_data_y_copy = histogram_data_y(i,:,j);
-
-        current_histogram_data_x((current_histogram_data_x_copy==0 & current_histogram_data_y_copy~=0)) = [];
-        current_histogram_data_y((current_histogram_data_y_copy==0 & current_histogram_data_x_copy~=0)) = [];
-        
-        current_histogram_data_x = no_trailing_zeros(current_histogram_data_x);
-        current_histogram_data_y = no_trailing_zeros(current_histogram_data_y);
-        
-        % Store the processed data for histogram plotting
-        all_displacement_storage_x = [all_displacement_storage_x current_histogram_data_x];
-        all_displacement_storage_y = [all_displacement_storage_y current_histogram_data_y];
+%         current_histogram_data_x = histogram_data_x(i,:,j);
+%         current_histogram_data_y = histogram_data_y(i,:,j);
+%         
+%         current_histogram_data_x_copy = histogram_data_x(i,:,j);
+%         current_histogram_data_y_copy = histogram_data_y(i,:,j);
+% 
+%         current_histogram_data_x((current_histogram_data_x_copy==0 & current_histogram_data_y_copy~=0)) = [];
+%         current_histogram_data_y((current_histogram_data_y_copy==0 & current_histogram_data_x_copy~=0)) = [];
+%         
+%         current_histogram_data_x = no_trailing_zeros(current_histogram_data_x);
+%         current_histogram_data_y = no_trailing_zeros(current_histogram_data_y);
+%         
+%         % Store the processed data for histogram plotting
+%         all_displacement_storage_x = [all_displacement_storage_x current_histogram_data_x];
+%         all_displacement_storage_y = [all_displacement_storage_y current_histogram_data_y];
         % FIRST METHOD (FILTERING) %
         
         % SECOND METHOD (NO FILTERING) %
@@ -258,10 +258,17 @@ for j = 1:size(multiples_delta_time,2)
 %         all_displacement_storage_y = [all_displacement_storage_y no_trailing_zeros(histogram_data_y(i,:,j))];
         % SECOND METHOD (NO FILTERING) %
         
+        % THIRD METHOD (EVEN LESS FILTERING) %
+        % Store the processed data for histogram plotting
+        all_displacement_storage_x = [all_displacement_storage_x histogram_data_x(i,:,j)];
+        all_displacement_storage_y = [all_displacement_storage_y histogram_data_y(i,:,j)];
+        % THIRD METHOD (EVEN LESS FILTERING) %
+        
     end
     
     % Combine the direction-specific data for histogram plotting
-    all_displacement_storage_both = [all_displacement_storage_x all_displacement_storage_y];
+%     all_displacement_storage_both = [all_displacement_storage_x all_displacement_storage_y];
+    all_displacement_storage_both = all_displacement_storage_y;
     
 %     figure()
 %     histogram(all_displacement_storage_x, 'Normalization', 'pdf')
@@ -306,39 +313,42 @@ end
 %     for i = 1:n
 %         for j = 1:time_pts-dt
 %             histogram_data(i,j,counter_hist) = pdist([data_matrix(i,j,1),data_matrix(i,j,2);data_matrix(i,j+dt,1),data_matrix(i,j+dt,2)]);
-% %             hist_displacement_x = data_matrix(i,j+dt,1) - data_matrix(i,j,1);
-% %             hist_displacement_y = data_matrix(i,j+dt,2) - data_matrix(i,j,2);
-%             % If both displacement components are negative or if the x component is negative and the y component is positive, the displacement is considered to be negative
-% %             if (hist_displacement_x<=0 && hist_displacement_y<0) || (hist_displacement_x<=0 && hist_displacement_y>0)
-% %                 histogram_data(i,j,counter_hist) = -sqrt(hist_displacement_x^2 + hist_displacement_y^2);
-% %             else
-% %                 histogram_data(i,j,counter_hist) = sqrt(hist_displacement_x^2 + hist_displacement_y^2);
-% %             end
+%             hist_displacement_x = data_matrix(i,j+dt,1) - data_matrix(i,j,1);
+%             hist_displacement_y = data_matrix(i,j+dt,2) - data_matrix(i,j,2);
+% %             If both displacement components are negative or if the x component is negative and the y component is positive, the displacement is considered to be negative
+%             if (hist_displacement_x<=0 && hist_displacement_y<0) || (hist_displacement_x<=0 && hist_displacement_y>0)
+%                 histogram_data(i,j,counter_hist) = -sqrt(hist_displacement_x^2 + hist_displacement_y^2);
+% %                 histogram_data(i,j,counter_hist) = -(hist_displacement_x^2 + hist_displacement_y^2);
+%             else
+%                 histogram_data(i,j,counter_hist) = sqrt(hist_displacement_x^2 + hist_displacement_y^2);
+% %                 histogram_data(i,j,counter_hist) = (hist_displacement_x^2 + hist_displacement_y^2);
+%             end
 % %             histogram_data(i,j,counter_hist) = hist_displacement_y;
+% %             histogram_data(i,j,counter_hist) = (hist_displacement_x^2 + hist_displacement_y^2);
 %         end
 %     end
 %     counter_hist = counter_hist + 1;
 % end
 % 
-% % Remove erroneous displacements that result from a particle striking the boundary
-% for i = 1:n
-%     for j = 1:size(multiples_delta_time,2)
-% %         if boundary_collision(i) == 1 %only modify the displacement data if the given  particle strikes the boundary
-% %             first_zero_idx = find(((histogram_data(i,:,j)==0)+([diff(histogram_data(i,:,j)) 0]==0))==2,1); %find the index of the two consecutive zeros in histogram_data for the given multiple of delta-t
-% %             histogram_data(i,(first_zero_idx-multiples_delta_time(j)):first_zero_idx-1,j) = 0; %remove the appropriate number of erroneous displacements
+% % % Remove erroneous displacements that result from a particle striking the boundary
+% % for i = 1:n
+% %     for j = 1:size(multiples_delta_time,2)
+% % %         if boundary_collision(i) == 1 %only modify the displacement data if the given  particle strikes the boundary
+% % %             first_zero_idx = find(((histogram_data(i,:,j)==0)+([diff(histogram_data(i,:,j)) 0]==0))==2,1); %find the index of the two consecutive zeros in histogram_data for the given multiple of delta-t
+% % %             histogram_data(i,(first_zero_idx-multiples_delta_time(j)):first_zero_idx-1,j) = 0; %remove the appropriate number of erroneous displacements
+% % %         end
+% %         if boundary_collision(i) == 1 %only modify the displacement data if the given particle strikes the boundary
+% %             start_of_trailing_zeros = find(histogram_data(i,:,j),1,'last') + 1;
+% %             try
+% %                 % Remove the appropriate number of erroneous displacements
+% %                 histogram_data(i,(start_of_trailing_zeros-multiples_delta_time(j)):start_of_trailing_zeros-1,j) = 0; 
+% %             catch
+% %                 % If the particle stopped so early that all displacements are erroneous, set the enter set of displacements to zero
+% %                 histogram_data(i,:,j) = 0;
+% %             end
 % %         end
-%         if boundary_collision(i) == 1 %only modify the displacement data if the given particle strikes the boundary
-%             start_of_trailing_zeros = find(histogram_data(i,:,j),1,'last') + 1;
-%             try
-%                 % Remove the appropriate number of erroneous displacements
-%                 histogram_data(i,(start_of_trailing_zeros-multiples_delta_time(j)):start_of_trailing_zeros-1,j) = 0; 
-%             catch
-%                 % If the particle stopped so early that all displacements are erroneous, set the enter set of displacements to zero
-%                 histogram_data(i,:,j) = 0;
-%             end
-%         end
-%     end
-% end
+% %     end
+% % end
 % 
 % % Generate one histogram for each multiple of delta-t
 % for i = 1:size(multiples_delta_time,2)
