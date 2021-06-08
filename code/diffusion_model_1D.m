@@ -467,10 +467,13 @@ for i = 1:n
     end
 end
 
+sdlt_plotting_log = log10(sdlt_plotting);
+
 % Plot the time-averaged squared displacements versus lag time curves
 figure()
 for i = 1:n
-    plot(sdlt_plotting(i,:))
+%     plot(sdlt_plotting(i,:))
+    loglog(sdlt_plotting_log(i,:))
     hold on
 end
 
@@ -502,14 +505,25 @@ for i = 1:size(delta_taus,2)
 end
 % SECOND METHOD %
 
+msd_tau_plotting_log = log10(msd_tau_plotting);
+
 % Plot the corresponding time-averaged MSD(delta-tau) curve
-plot(msd_tau_plotting,'LineWidth',2,'Color','red')
+% plot(msd_tau_plotting,'LineWidth',2,'Color','red')
+% plot(msd_tau_plotting,'LineWidth',2,'Color','red')
+loglog(msd_tau_plotting_log,'LineWidth',2,'Color','red')
 title('Time-Averaged Squared Displacement vs. Lag Time')
 xlabel('Lag Time \Delta\tau [simulation time points]')
 ylabel('Time-Averaged MSD(\Delta\tau) [(10^{-2}\mum)^2]')
 
 % Fetch the line of best fit for the MSD(tau)
 msd_tau_fit = polyfit(log10(delta_taus(1:end/2)),log10(msd_tau_plotting(1:end/2)),1);
+% msd_tau_fit = polyfit(delta_taus(1:end/2),msd_tau_plotting(1:end/2),1);
 disp(msd_tau_fit)
+
+% y_fit_vals = (log10(msd_tau_fit(1)))*x_fit_vals+(log10(msd_tau_fit(2)));
+
+x_fit_vals = delta_taus;
+y_fit_vals = polyval(msd_tau_fit,log10(x_fit_vals));
+loglog(x_fit_vals,y_fit_vals,'LineWidth',3,'Color','Black')
 
 toc %end benchmarking
