@@ -123,6 +123,7 @@ for i = 1:n %iterate through each particle
         
         direction_select = randi(4); %randomly select a direction
         
+        % THE PARTICLE CAN ONLY TRAVEL IN THE X-DIRECTION
         if direction_select == 1 %+x (RIGHT)
             data_matrix(i,j,1) = data_matrix(i,j-1,1) + abs(current_displacement);
             data_matrix(i,j,2) = data_matrix(i,j-1,2);
@@ -131,13 +132,13 @@ for i = 1:n %iterate through each particle
             data_matrix(i,j,1) = data_matrix(i,j-1,1) - abs(current_displacement);
             data_matrix(i,j,2) = data_matrix(i,j-1,2);
             current_displacement_storage(i,j-1) = -current_displacement;
-        elseif direction_select == 3 %+y (DOWN)
-            data_matrix(i,j,1) = data_matrix(i,j-1,1);
-            data_matrix(i,j,2) = data_matrix(i,j-1,2) + abs(current_displacement);
+        elseif direction_select == 3 %+x (RIGHT)
+            data_matrix(i,j,1) = data_matrix(i,j-1,1) + abs(current_displacement);
+            data_matrix(i,j,2) = data_matrix(i,j-1,2);
             current_displacement_storage(i,j-1) = -current_displacement;
-        elseif direction_select == 4 %-y (UP)
-            data_matrix(i,j,1) = data_matrix(i,j-1,1);
-            data_matrix(i,j,2) = data_matrix(i,j-1,2) - abs(current_displacement);
+        elseif direction_select == 4 %-x (LEFT)
+            data_matrix(i,j,1) = data_matrix(i,j-1,1) - abs(current_displacement);
+            data_matrix(i,j,2) = data_matrix(i,j-1,2);
             current_displacement_storage(i,j-1) = current_displacement;
         end
     end
@@ -196,29 +197,29 @@ fit_data_pdf = pdf(fit_data,eval_vals); %compute the corresponding PDF
 hold on
 plot(eval_vals,fit_data_pdf,'LineWidth',2) %overlay the PDF on top of the histogram
 title('Step Size Distribution')
-xlabel('\Deltax, \Deltay [10^{-2}\mum]')
-ylabel('P(\Deltax, \Deltay, \Delta\tau=1 time point)')
+xlabel('\Deltax, [10^{-2}\mum]')
+ylabel('P(\Deltax, \Delta\tau=1 time point)')
 fit_legend = strcat(['Mean = ' num2str(fit_data.mu) ', Std. Dev. = ' num2str(fit_data.sigma)]);
 legend('Distribution',fit_legend)
 
 % Histograms for displacements using greater multiples of delta-t (iteratively: multiples_delta_time*(delta-t))
 histogram_data_x = zeros(n,time_pts,size(multiples_delta_time,2));
-histogram_data_y = zeros(n,time_pts,size(multiples_delta_time,2));
+% histogram_data_y = zeros(n,time_pts,size(multiples_delta_time,2));
 counter_hist = 1;
 for dt = multiples_delta_time
     for i = 1:n
         for j = 1:time_pts-dt
             histogram_data_x(i,j,counter_hist) = data_matrix(i,j+dt,1) - data_matrix(i,j,1);
-            histogram_data_y(i,j,counter_hist) = data_matrix(i,j+dt,2) - data_matrix(i,j,2);
+%             histogram_data_y(i,j,counter_hist) = data_matrix(i,j+dt,2) - data_matrix(i,j,2);
         end
     end
     counter_hist = counter_hist + 1;
 end
 
 for j = 1:size(multiples_delta_time,2)
-    clearvars all_displacement_storage_x all_displacement_storage_y all_displacement_storage_both eval_vals hist_obj fit_data_pdf
+    clearvars all_displacement_storage_x all_displacement_storage_both eval_vals hist_obj fit_data_pdf
     all_displacement_storage_x = [];
-    all_displacement_storage_y = [];
+%     all_displacement_storage_y = [];
     for i = 1:n
         % Remove erroneous displacements that result from a particle striking the boundary
 %         if boundary_collision(i) == 1 %only modify the displacement data if the given particle strikes the boundary
@@ -254,28 +255,22 @@ for j = 1:size(multiples_delta_time,2)
         
         % SECOND METHOD (NO FILTERING) %
         % Store the processed data for histogram plotting
-%         all_displacement_storage_x = [all_displacement_storage_x no_trailing_zeros(histogram_data_x(i,:,j))];
+        all_displacement_storage_x = [all_displacement_storage_x no_trailing_zeros(histogram_data_x(i,:,j))];
 %         all_displacement_storage_y = [all_displacement_storage_y no_trailing_zeros(histogram_data_y(i,:,j))];
         % SECOND METHOD (NO FILTERING) %
         
         % THIRD METHOD (EVEN LESS FILTERING) %
         % Store the processed data for histogram plotting
-        all_displacement_storage_x = [all_displacement_storage_x histogram_data_x(i,:,j)];
-        all_displacement_storage_y = [all_displacement_storage_y histogram_data_y(i,:,j)];
+%         all_displacement_storage_x = [all_displacement_storage_x histogram_data_x(i,:,j)];
+%         all_displacement_storage_y = [all_displacement_storage_y histogram_data_y(i,:,j)];
         % THIRD METHOD (EVEN LESS FILTERING) %
         
     end
     
     % Combine the direction-specific data for histogram plotting
-    all_displacement_storage_both = [all_displacement_storage_x all_displacement_storage_y];
-%     all_displacement_storage_both = all_displacement_storage_x;
-    
-    length(all_displacement_storage_both)
+%     all_displacement_storage_both = [all_displacement_storage_x all_displacement_storage_y];
+    all_displacement_storage_both = all_displacement_storage_x;
 
-    all_displacement_storage_both = all_displacement_storage_both(randperm(length(all_displacement_storage_both)));
-    all_displacement_storage_both(1:round(end/4)) = [];
-
-    length(all_displacement_storage_both)
 %     figure()
 %     histogram(all_displacement_storage_x, 'Normalization', 'pdf')
 %     title('Step Size Distribution')
@@ -303,8 +298,8 @@ for j = 1:size(multiples_delta_time,2)
     plot(eval_vals,fit_data_pdf,'LineWidth',2) %overlay the PDF on top of the histogram
     
     title('Step Size Distribution')
-    xlabel('\Deltax, \Deltay [10^{-2}\mum]')
-    hist_y_label_str = strcat(['P(\Deltax, \Deltay, \Delta\tau=' num2str(multiples_delta_time(j)) ' time points)']);
+    xlabel('\Deltax, [10^{-2}\mum]')
+    hist_y_label_str = strcat(['P(\Deltax, \Delta\tau=' num2str(multiples_delta_time(j)) ' time points)']);
     ylabel(hist_y_label_str)
     fit_legend = strcat(['Mean = ' num2str(fit_data.mu) ', Std. Dev. = ' num2str(fit_data.sigma)]);
     legend('Distribution',fit_legend)
@@ -394,8 +389,8 @@ squared_displacements_abs_time = zeros(n,time_pts);
 for i = 1:n
     for j = 1:time_pts
         displacement_x = data_matrix(i,j,1) - data_matrix(i,1,1);
-        displacement_y = data_matrix(i,j,2) - data_matrix(i,1,2);
-        squared_displacements_abs_time(i,j) = displacement_x^2 + displacement_y^2;
+%         displacement_y = data_matrix(i,j,2) - data_matrix(i,1,2);
+        squared_displacements_abs_time(i,j) = displacement_x^2; %+ displacement_y^2;
     end
 end
 
@@ -439,26 +434,26 @@ for dt = delta_taus
     for i = 1:n
         for j = 1:time_pts-dt
             tamsd_plot_displacement_x = data_matrix(i,j+dt,1) - data_matrix(i,j,1);
-            tamsd_plot_displacement_y = data_matrix(i,j+dt,2) - data_matrix(i,j,2);
-            sqd_dispmnts_lag_time(i,j,counter_msd_tau) = tamsd_plot_displacement_x^2 + tamsd_plot_displacement_y^2;
+%             tamsd_plot_displacement_y = data_matrix(i,j+dt,2) - data_matrix(i,j,2);
+            sqd_dispmnts_lag_time(i,j,counter_msd_tau) = tamsd_plot_displacement_x^2; %+ tamsd_plot_displacement_y^2;
         end
     end
     counter_msd_tau = counter_msd_tau + 1;
 end
 
 % Remove erroneous displacements that result from a particle striking the boundary
-for i = 1:n
-    for j = 1:size(delta_taus,2)
-        if boundary_collision(i) == 1 %only modify the displacement data if the given  particle strikes the boundary
-            first_zero_idx = find(((sqd_dispmnts_lag_time(i,:,j)==0)+([diff(sqd_dispmnts_lag_time(i,:,j)) 0]==0))==2,1); %find the index of the two consecutive zeros in sqd_dispmnts_lag_time for the given multiple of delta-t
-            try
-                sqd_dispmnts_lag_time(i,(first_zero_idx-delta_taus(j)):first_zero_idx-1,j) = 0; %remove the appropriate number of erroneous displacements
-            catch
-                sqd_dispmnts_lag_time(i,:,j) = 0; %remove all displacements if the particle is immobilized at a time point lesser than the value of the time lag
-            end
-        end
-    end
-end
+% for i = 1:n
+%     for j = 1:size(delta_taus,2)
+%         if boundary_collision(i) == 1 %only modify the displacement data if the given  particle strikes the boundary
+%             first_zero_idx = find(((sqd_dispmnts_lag_time(i,:,j)==0)+([diff(sqd_dispmnts_lag_time(i,:,j)) 0]==0))==2,1); %find the index of the two consecutive zeros in sqd_dispmnts_lag_time for the given multiple of delta-t
+%             try
+%                 sqd_dispmnts_lag_time(i,(first_zero_idx-delta_taus(j)):first_zero_idx-1,j) = 0; %remove the appropriate number of erroneous displacements
+%             catch
+%                 sqd_dispmnts_lag_time(i,:,j) = 0; %remove all displacements if the particle is immobilized at a time point lesser than the value of the time lag
+%             end
+%         end
+%     end
+% end
 
 % Set up the plot for the time-averaged squared displacements versus lag time curves
 sdlt_plotting = zeros(n,size(delta_taus,2));

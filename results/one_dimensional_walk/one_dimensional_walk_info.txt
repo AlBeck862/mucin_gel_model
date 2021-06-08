@@ -1,0 +1,21 @@
+Lattice units: 10^-2 um scaling
+Number of walks: 10
+Time points (each particle): 5000
+Random start locations: no (centred)
+Walk Samples A & B: two sample walks of the 10 that were simulated
+histogram_1dt: normalized histogram of displacements for 1*delta-t
+histogram_2dt: normalized histogram of displacements for 2*delta-t
+histogram_3dt: normalized histogram of displacements for 3*delta-t
+histogram_4dt: normalized histogram of displacements for 4*delta-t
+histogram_5dt: normalized histogram of displacements for 5*delta-t
+histogram_10dt: normalized histogram of displacements for 10*delta-t
+histogram_50dt: normalized histogram of displacements for 50*delta-t
+histogram_100dt: normalized histogram of displacements for 100*delta-t
+histogram_125dt: normalized histogram of displacements for 125*delta-t
+histogram_150dt: normalized histogram of displacements for 150*delta-t
+histogram_175dt: normalized histogram of displacements for 175*delta-t
+histogram_200dt: normalized histogram of displacements for 200*delta-t
+msd_dt: squared displacement versus absolute time curves + MSD(dt) curve
+msd_dtau: squared displacement versus lag time curves + time-averaged MSD(dtau) curve
+
+Note: the walk was simulated in one dimension only (in the x-direction).
