@@ -1,7 +1,8 @@
 Lattice units: 10^-2 um scaling
 Number of walks: 10
 Time points (each particle): 5000
-Random start locations: no (centred)
+Random start locations: no
+Walk Samples A-C: three sample walks of the 10 that were simulated
 histogram_1dt: normalized histogram of displacements for 1*delta-t
 histogram_2dt: normalized histogram of displacements for 2*delta-t
 histogram_3dt: normalized histogram of displacements for 3*delta-t
@@ -17,5 +18,5 @@ histogram_200dt: normalized histogram of displacements for 200*delta-t
 msd_dt: squared displacement versus absolute time curves + MSD(dt) curve
 msd_dtau: squared displacement versus lag time curves + time-averaged MSD(dtau) curve
 
-Note: the walk was simulated in one dimension only (in the x-direction).
-Note: the PDF's scaling was 2DT (THIS IS NOW KNOWN TO BE INCORRECT).
+Note: a single-diffusivity lattice (D=2500) was used.
+Note: the PDF was defined using a coefficient of 8.

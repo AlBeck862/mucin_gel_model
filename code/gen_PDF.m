@@ -3,10 +3,10 @@ function cdf = gen_PDF(D,tau,x)
 % (tau), and range of x values (x).
 
 % Define the PDF given the diffusivity and time step values (1D walk)
-P = 1/(sqrt(2*pi*D*tau))*exp(-(x.^2/(2*D*tau)));
+% P = 1/(sqrt(4*pi*D*tau))*exp(-(x.^2/(4*D*tau)));
 
 % Define the PDF given the diffusivity and time step values (2D walk)
-% P = 1/(sqrt(4*pi*D*tau))*exp(-(x.^2/(4*D*tau)));
+P = 1/(sqrt(8*pi*D*tau))*exp(-(x.^2/(8*D*tau)));
 
 % Verify that the PDF is defined for all necessary x values
 cdf = cumtrapz(x,P);

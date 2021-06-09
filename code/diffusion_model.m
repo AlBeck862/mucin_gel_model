@@ -234,7 +234,7 @@ for j = 1:size(multiples_delta_time,2)
 %             end
 %         end
         
-        % FIRST METHOD (FILTERING) %
+%         % FIRST METHOD (FILTERING) %
 %         current_histogram_data_x = histogram_data_x(i,:,j);
 %         current_histogram_data_y = histogram_data_y(i,:,j);
 %         
@@ -254,14 +254,14 @@ for j = 1:size(multiples_delta_time,2)
         
         % SECOND METHOD (NO FILTERING) %
         % Store the processed data for histogram plotting
-%         all_displacement_storage_x = [all_displacement_storage_x no_trailing_zeros(histogram_data_x(i,:,j))];
-%         all_displacement_storage_y = [all_displacement_storage_y no_trailing_zeros(histogram_data_y(i,:,j))];
+        all_displacement_storage_x = [all_displacement_storage_x no_trailing_zeros(histogram_data_x(i,:,j))];
+        all_displacement_storage_y = [all_displacement_storage_y no_trailing_zeros(histogram_data_y(i,:,j))];
         % SECOND METHOD (NO FILTERING) %
         
         % THIRD METHOD (EVEN LESS FILTERING) %
         % Store the processed data for histogram plotting
-        all_displacement_storage_x = [all_displacement_storage_x histogram_data_x(i,:,j)];
-        all_displacement_storage_y = [all_displacement_storage_y histogram_data_y(i,:,j)];
+%         all_displacement_storage_x = [all_displacement_storage_x histogram_data_x(i,:,j)];
+%         all_displacement_storage_y = [all_displacement_storage_y histogram_data_y(i,:,j)];
         % THIRD METHOD (EVEN LESS FILTERING) %
         
     end
@@ -270,12 +270,6 @@ for j = 1:size(multiples_delta_time,2)
     all_displacement_storage_both = [all_displacement_storage_x all_displacement_storage_y];
 %     all_displacement_storage_both = all_displacement_storage_x;
     
-    length(all_displacement_storage_both)
-
-    all_displacement_storage_both = all_displacement_storage_both(randperm(length(all_displacement_storage_both)));
-    all_displacement_storage_both(1:round(end/4)) = [];
-
-    length(all_displacement_storage_both)
 %     figure()
 %     histogram(all_displacement_storage_x, 'Normalization', 'pdf')
 %     title('Step Size Distribution')
