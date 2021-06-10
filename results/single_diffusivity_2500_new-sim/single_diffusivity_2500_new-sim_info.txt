@@ -1,0 +1,28 @@
+Lattice units: 10^-2 um scaling
+Lattice parameters: single diffusivity, D=2500
+Number of walks: 10
+Time points (each particle): 5000
+Random start locations: no (centred)
+
+walks A-J: the ten simulated walks
+
+histogram_1dt_dx: normalized histogram of displacements in the x-direction for 1*delta-t
+histogram_5dt_dx: normalized histogram of displacements in the x-direction for 5*delta-t
+histogram_10dt_dx: normalized histogram of displacements in the x-direction for 10*delta-t
+histogram_50dt_dx: normalized histogram of displacements in the x-direction for 50*delta-t
+histogram_100dt_dx: normalized histogram of displacements in the x-direction for 100*delta-t
+histogram_150dt_dx: normalized histogram of displacements in the x-direction for 150*delta-t
+histogram_200dt_dx: normalized histogram of displacements in the x-direction for 200*delta-t
+
+histogram_1dt_dy: normalized histogram of displacements in the y-direction for 1*delta-t
+histogram_5dt_dy: normalized histogram of displacements in the y-direction for 5*delta-t
+histogram_10dt_dy: normalized histogram of displacements in the y-direction for 10*delta-t
+histogram_50dt_dy: normalized histogram of displacements in the y-direction for 50*delta-t
+histogram_100dt_dy: normalized histogram of displacements in the y-direction for 100*delta-t
+histogram_150dt_dy: normalized histogram of displacements in the y-direction for 150*delta-t
+histogram_200dt_dy: normalized histogram of displacements in the y-direction for 200*delta-t
+
+msd_dt: squared displacement versus absolute time curves + MSD(dt) curve
+msd_dtau: squared displacement versus lag time curves + time-averaged MSD(dtau) curve
+
+Note: this was the first use of the new simulation method which uses simultaneous x-direction displacements and y-direction displacements at each particle "jump"

@@ -1,7 +1,7 @@
 tic %begin benchmarking
 
 % Diffusion model
-% IMPORTANT NOTE: the x-axis and y-axis are reversed due to MATLAB row-column data storage convention
+% IMPORTANT NOTE: the x-axis and y-axis are reversed due to MATLAB's row-column data storage convention
 
 global x all_cdf diffusivities
 
@@ -13,6 +13,7 @@ heterogeneity = 0.5; %0: perfectly homogeneous, 1: maximal heterogeneity **CURRE
 lattice_x = 1e4; % --> used only if a lattice is generated
 lattice_y = 1e4; % --> used only if a lattice is generated
 conversion_factor = 0.1; %conversion factor, units of seconds per time point
+single_diffusivity = 1; %0: multiple subregions, 1: uniform lattice
 
 % Simulation parameters
 time_pts = 5000; %total time points (absolute time, camera frame-rate)
@@ -20,7 +21,7 @@ n = 10; %number of simulated particles.
 random_start = 0; %0: all particles start at the center of the lattice, 1: particles are each assigned a random start location, -1: all particles start a hard-coded location
 
 % Plotting parameters
-multiples_delta_time = [1,2,3,4,5,10,50,100,125,150,175,200]; %additional time point intervals for displacement histogram generation (each value corresponds to a histogram)
+multiples_delta_time = [1,5,10,50,100,150,200]; %additional time point intervals for displacement histogram generation (each value corresponds to a histogram)
 
 %%% SET UP %%%
 % Fetch a lattice
@@ -32,7 +33,7 @@ try
 catch
     disp('No pre-existing lattice is available. Generating a new lattice.')
     tic %begin benchmarking
-    [lattice,x,all_cdf,diffusivities] = gen_lattice(save_lattice,heterogeneity,lattice_x,lattice_y,conversion_factor);
+    [lattice,x,all_cdf,diffusivities] = gen_lattice(save_lattice,heterogeneity,lattice_x,lattice_y,conversion_factor,single_diffusivity);
     toc %end benchmarking
     disp('Lattice generated successfully.')
 end
@@ -119,27 +120,31 @@ for i = 1:n %iterate through each particle
             break
         end
         
-        current_displacement = round(get_dispmnt_variation(current_diffusivity)); %randomly select a distance
+        current_displacement_x = round(get_dispmnt_variation(current_diffusivity)); %randomly select a distance in the x-direction
+        current_displacement_y = round(get_dispmnt_variation(current_diffusivity)); %randomly select a distance in the y-direction
         
-        direction_select = randi(4); %randomly select a direction
+        data_matrix(i,j,1) = data_matrix(i,j-1,1) + current_displacement_x;
+        data_matrix(i,j,2) = data_matrix(i,j-1,2) + current_displacement_y;
         
-        if direction_select == 1 %+x (RIGHT)
-            data_matrix(i,j,1) = data_matrix(i,j-1,1) + abs(current_displacement);
-            data_matrix(i,j,2) = data_matrix(i,j-1,2);
-            current_displacement_storage(i,j-1) = current_displacement;
-        elseif direction_select == 2 %-x (LEFT)
-            data_matrix(i,j,1) = data_matrix(i,j-1,1) - abs(current_displacement);
-            data_matrix(i,j,2) = data_matrix(i,j-1,2);
-            current_displacement_storage(i,j-1) = -current_displacement;
-        elseif direction_select == 3 %+y (DOWN)
-            data_matrix(i,j,1) = data_matrix(i,j-1,1);
-            data_matrix(i,j,2) = data_matrix(i,j-1,2) + abs(current_displacement);
-            current_displacement_storage(i,j-1) = -current_displacement;
-        elseif direction_select == 4 %-y (UP)
-            data_matrix(i,j,1) = data_matrix(i,j-1,1);
-            data_matrix(i,j,2) = data_matrix(i,j-1,2) - abs(current_displacement);
-            current_displacement_storage(i,j-1) = current_displacement;
-        end
+%         direction_select = randi(4); %randomly select a direction
+%         
+%         if direction_select == 1 %+x (RIGHT)
+%             data_matrix(i,j,1) = data_matrix(i,j-1,1) + abs(current_displacement);
+%             data_matrix(i,j,2) = data_matrix(i,j-1,2);
+%             current_displacement_storage(i,j-1) = current_displacement;
+%         elseif direction_select == 2 %-x (LEFT)
+%             data_matrix(i,j,1) = data_matrix(i,j-1,1) - abs(current_displacement);
+%             data_matrix(i,j,2) = data_matrix(i,j-1,2);
+%             current_displacement_storage(i,j-1) = -current_displacement;
+%         elseif direction_select == 3 %+y (DOWN)
+%             data_matrix(i,j,1) = data_matrix(i,j-1,1);
+%             data_matrix(i,j,2) = data_matrix(i,j-1,2) + abs(current_displacement);
+%             current_displacement_storage(i,j-1) = -current_displacement;
+%         elseif direction_select == 4 %-y (UP)
+%             data_matrix(i,j,1) = data_matrix(i,j-1,1);
+%             data_matrix(i,j,2) = data_matrix(i,j-1,2) - abs(current_displacement);
+%             current_displacement_storage(i,j-1) = current_displacement;
+%         end
     end
 end
 
@@ -176,32 +181,32 @@ end
 
 %%% HISTOGRAMS %%%
 % Histogram for all displacements (1*(delta-t))
-clearvars all_displacement_storage eval_vals hist_obj fit_data_pdf
-all_displacement_storage = [];
-for i = 1:n
-    % Store the processed data for histogram plotting
-    all_displacement_storage = [all_displacement_storage no_trailing_zeros(current_displacement_storage(i,:))];
-end
+% clearvars all_displacement_storage eval_vals hist_obj fit_data_pdf
+% all_displacement_storage = [];
+% for i = 1:n
+%     % Store the processed data for histogram plotting
+%     all_displacement_storage = [all_displacement_storage no_trailing_zeros(current_displacement_storage(i,:))];
+% end
+% 
+% % Plot the histogram
+% figure()
+% hist_obj = histogram(all_displacement_storage, 'Normalization', 'pdf');
+% fit_data = fitdist(all_displacement_storage','Normal'); %obtain fit data
+% 
+% % fit_data = fitdist(all_displacement_storage','Logistic');
+% % fit_data = fitdist(all_displacement_storage','Stable');
+% 
+% eval_vals = (hist_obj.BinEdges(1)-20:0.1:hist_obj.BinEdges(end)+20);
+% fit_data_pdf = pdf(fit_data,eval_vals); %compute the corresponding PDF
+% hold on
+% plot(eval_vals,fit_data_pdf,'LineWidth',2) %overlay the PDF on top of the histogram
+% title('Step Size Distribution')
+% xlabel('\Deltax, \Deltay [10^{-2}\mum]')
+% ylabel('P(\Deltax, \Deltay, \Delta\tau=1 time point)')
+% fit_legend = strcat(['Mean = ' num2str(fit_data.mu) ', Std. Dev. = ' num2str(fit_data.sigma)]);
+% legend('Distribution',fit_legend)
 
-% Plot the histogram
-figure()
-hist_obj = histogram(all_displacement_storage, 'Normalization', 'pdf');
-fit_data = fitdist(all_displacement_storage','Normal'); %obtain fit data
-
-% fit_data = fitdist(all_displacement_storage','Logistic');
-% fit_data = fitdist(all_displacement_storage','Stable');
-
-eval_vals = (hist_obj.BinEdges(1)-20:0.1:hist_obj.BinEdges(end)+20);
-fit_data_pdf = pdf(fit_data,eval_vals); %compute the corresponding PDF
-hold on
-plot(eval_vals,fit_data_pdf,'LineWidth',2) %overlay the PDF on top of the histogram
-title('Step Size Distribution')
-xlabel('\Deltax, \Deltay [10^{-2}\mum]')
-ylabel('P(\Deltax, \Deltay, \Delta\tau=1 time point)')
-fit_legend = strcat(['Mean = ' num2str(fit_data.mu) ', Std. Dev. = ' num2str(fit_data.sigma)]);
-legend('Distribution',fit_legend)
-
-% Histograms for displacements using greater multiples of delta-t (iteratively: multiples_delta_time*(delta-t))
+% Histograms for displacements using predefined multiples of delta-t (iteratively: multiples_delta_time*(delta-t))
 histogram_data_x = zeros(n,time_pts,size(multiples_delta_time,2));
 histogram_data_y = zeros(n,time_pts,size(multiples_delta_time,2));
 counter_hist = 1;
@@ -221,18 +226,18 @@ for j = 1:size(multiples_delta_time,2)
     all_displacement_storage_y = [];
     for i = 1:n
         % Remove erroneous displacements that result from a particle striking the boundary
-%         if boundary_collision(i) == 1 %only modify the displacement data if the given particle strikes the boundary
-%             start_of_trailing_zeros = find(histogram_data_x(i,:,j),1,'last') + 1;
-%             try
-%                 % Remove the appropriate number of erroneous displacements
-%                 histogram_data_x(i,(start_of_trailing_zeros-multiples_delta_time(j)):start_of_trailing_zeros-1,j) = 0; 
-%                 histogram_data_y(i,(start_of_trailing_zeros-multiples_delta_time(j)):start_of_trailing_zeros-1,j) = 0;
-%             catch
-%                 % If the particle stopped so early that all displacements are erroneous, set the enter set of displacements to zero
-%                 histogram_data_x(i,:,j) = 0;
-%                 histogram_data_y(i,:,j) = 0;
-%             end
-%         end
+        if boundary_collision(i) == 1 %only modify the displacement data if the given particle strikes the boundary
+            start_of_trailing_zeros = find(histogram_data_x(i,:,j),1,'last') + 1;
+            try
+                % Remove the appropriate number of erroneous displacements
+                histogram_data_x(i,(start_of_trailing_zeros-multiples_delta_time(j)):start_of_trailing_zeros-1,j) = 0; 
+                histogram_data_y(i,(start_of_trailing_zeros-multiples_delta_time(j)):start_of_trailing_zeros-1,j) = 0;
+            catch
+                % If the particle stopped so early that all displacements are erroneous, set the enter set of displacements to zero
+                histogram_data_x(i,:,j) = 0;
+                histogram_data_y(i,:,j) = 0;
+            end
+        end
         
 %         % FIRST METHOD (FILTERING) %
 %         current_histogram_data_x = histogram_data_x(i,:,j);
@@ -270,42 +275,63 @@ for j = 1:size(multiples_delta_time,2)
     all_displacement_storage_both = [all_displacement_storage_x all_displacement_storage_y];
 %     all_displacement_storage_both = all_displacement_storage_x;
     
-%     figure()
-%     histogram(all_displacement_storage_x, 'Normalization', 'pdf')
-%     title('Step Size Distribution')
-%     xlabel('\Deltax [10^{-2}\mum]')
-%     hist_y_label_str = strcat(['P(\Deltax, \Delta\tau=' num2str(multiples_delta_time(j)) ' time points)']);
-%     ylabel(hist_y_label_str)
-%     
-%     figure()
-%     histogram(all_displacement_storage_y, 'Normalization', 'pdf')
-%     title('Step Size Distribution')
-%     xlabel('\Deltay [10^{-2}\mum]')
-%     hist_y_label_str = strcat(['P(\Deltay, \Delta\tau=' num2str(multiples_delta_time(j)) ' time points)']);
-%     ylabel(hist_y_label_str)
-
-	figure()
-    hist_obj = histogram(all_displacement_storage_both, 'Normalization', 'pdf');
-    fit_data = fitdist(all_displacement_storage_both','Normal'); %obtain fit data
+    % x-direction displacements histogram
+    figure()
+    hist_obj_x = histogram(all_displacement_storage_x, 'Normalization', 'pdf');
+    fit_data_x = fitdist(all_displacement_storage_x','Normal'); %obtain fit data
     
-%     fit_data = fitdist(all_displacement_storage_both','Logistic');
-%     fit_data = fitdist(all_displacement_storage_both','Stable');
-    
-    eval_vals = (hist_obj.BinEdges(1)-20:0.1:hist_obj.BinEdges(end)+20);
-    fit_data_pdf = pdf(fit_data,eval_vals); %compute the corresponding PDF
+	eval_vals_x = (hist_obj_x.BinEdges(1)-20:0.1:hist_obj_x.BinEdges(end)+20);
+    fit_data_pdf_x = pdf(fit_data_x,eval_vals_x); %compute the corresponding PDF
     hold on
-    plot(eval_vals,fit_data_pdf,'LineWidth',2) %overlay the PDF on top of the histogram
+    plot(eval_vals_x,fit_data_pdf_x,'LineWidth',2) %overlay the PDF on top of the histogram
     
     title('Step Size Distribution')
-    xlabel('\Deltax, \Deltay [10^{-2}\mum]')
-    hist_y_label_str = strcat(['P(\Deltax, \Deltay, \Delta\tau=' num2str(multiples_delta_time(j)) ' time points)']);
+    xlabel('\Deltax [10^{-2}\mum]')
+    hist_y_label_str = strcat(['P(\Deltax, \Delta\tau=' num2str(multiples_delta_time(j)) ' time points)']);
     ylabel(hist_y_label_str)
-    fit_legend = strcat(['Mean = ' num2str(fit_data.mu) ', Std. Dev. = ' num2str(fit_data.sigma)]);
-    legend('Distribution',fit_legend)
+	fit_legend_x = strcat(['Mean = ' num2str(fit_data_x.mu) ', Std. Dev. = ' num2str(fit_data_x.sigma)]);
+    legend('Distribution',fit_legend_x)
+    
+	% y-direction displacements histogram
+    figure()
+    hist_obj_y = histogram(all_displacement_storage_y, 'Normalization', 'pdf');
+	fit_data_y = fitdist(all_displacement_storage_y','Normal'); %obtain fit data
+    
+	eval_vals_y = (hist_obj_y.BinEdges(1)-20:0.1:hist_obj_y.BinEdges(end)+20);
+    fit_data_pdf_y = pdf(fit_data_y,eval_vals_y); %compute the corresponding PDF
+    hold on
+    plot(eval_vals_y,fit_data_pdf_y,'LineWidth',2) %overlay the PDF on top of the histogram
+    
+    title('Step Size Distribution')
+    xlabel('\Deltay [10^{-2}\mum]')
+    hist_y_label_str = strcat(['P(\Deltay, \Delta\tau=' num2str(multiples_delta_time(j)) ' time points)']);
+    ylabel(hist_y_label_str)
+	fit_legend_y = strcat(['Mean = ' num2str(fit_data_y.mu) ', Std. Dev. = ' num2str(fit_data_y.sigma)]);
+    legend('Distribution',fit_legend_y)
+
+    % Stacked displacements histogram
+% 	figure()
+%     hist_obj = histogram(all_displacement_storage_both, 'Normalization', 'pdf');
+%     fit_data = fitdist(all_displacement_storage_both','Normal'); %obtain fit data
+%     
+% %     fit_data = fitdist(all_displacement_storage_both','Logistic');
+% %     fit_data = fitdist(all_displacement_storage_both','Stable');
+%     
+%     eval_vals = (hist_obj.BinEdges(1)-20:0.1:hist_obj.BinEdges(end)+20);
+%     fit_data_pdf = pdf(fit_data,eval_vals); %compute the corresponding PDF
+%     hold on
+%     plot(eval_vals,fit_data_pdf,'LineWidth',2) %overlay the PDF on top of the histogram
+%     
+%     title('Step Size Distribution')
+%     xlabel('\Deltax, \Deltay [10^{-2}\mum]')
+%     hist_y_label_str = strcat(['P(\Deltax, \Deltay, \Delta\tau=' num2str(multiples_delta_time(j)) ' time points)']);
+%     ylabel(hist_y_label_str)
+%     fit_legend = strcat(['Mean = ' num2str(fit_data.mu) ', Std. Dev. = ' num2str(fit_data.sigma)]);
+%     legend('Distribution',fit_legend)
     
 end
 
-% FOR TESTING %
+% FOR TESTING ("hypotenuse" approach) %
 
 % histogram_data = zeros(n,time_pts,size(multiples_delta_time,2));
 % counter_hist = 1;
@@ -316,13 +342,13 @@ end
 %             hist_displacement_x = data_matrix(i,j+dt,1) - data_matrix(i,j,1);
 %             hist_displacement_y = data_matrix(i,j+dt,2) - data_matrix(i,j,2);
 % %             If both displacement components are negative or if the x component is negative and the y component is positive, the displacement is considered to be negative
-%             if (hist_displacement_x<=0 && hist_displacement_y<0) || (hist_displacement_x<=0 && hist_displacement_y>0)
-%                 histogram_data(i,j,counter_hist) = -sqrt(hist_displacement_x^2 + hist_displacement_y^2);
-% %                 histogram_data(i,j,counter_hist) = -(hist_displacement_x^2 + hist_displacement_y^2);
-%             else
-%                 histogram_data(i,j,counter_hist) = sqrt(hist_displacement_x^2 + hist_displacement_y^2);
-% %                 histogram_data(i,j,counter_hist) = (hist_displacement_x^2 + hist_displacement_y^2);
-%             end
+% %             if (hist_displacement_x<=0 && hist_displacement_y<0) || (hist_displacement_x<=0 && hist_displacement_y>0)
+% %                 histogram_data(i,j,counter_hist) = -sqrt(hist_displacement_x^2 + hist_displacement_y^2);
+% % %                 histogram_data(i,j,counter_hist) = -(hist_displacement_x^2 + hist_displacement_y^2);
+% %             else
+% %                 histogram_data(i,j,counter_hist) = sqrt(hist_displacement_x^2 + hist_displacement_y^2);
+% % %                 histogram_data(i,j,counter_hist) = (hist_displacement_x^2 + hist_displacement_y^2);
+% %             end
 % %             histogram_data(i,j,counter_hist) = hist_displacement_y;
 % %             histogram_data(i,j,counter_hist) = (hist_displacement_x^2 + hist_displacement_y^2);
 %         end
@@ -352,7 +378,7 @@ end
 % 
 % % Generate one histogram for each multiple of delta-t
 % for i = 1:size(multiples_delta_time,2)
-% %     clearvar hist_plotting
+%     clearvars hist_plotting
 %     hist_plotting = histogram_data(:,:,i);
 %     hist_plotting = reshape(hist_plotting,[1,numel(hist_plotting)]);
 %     hist_plotting(hist_plotting==0) = [];
@@ -378,7 +404,7 @@ end
 % 
 % end
 
-% FOR TESTING %
+% FOR TESTING ("hypotenuse" approach) %
 
 %%% MSD(DELTA-T) %%%
 % MSD(delta-t) plot
