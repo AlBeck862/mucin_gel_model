@@ -13,17 +13,22 @@ heterogeneity = 0.5; %0: perfectly homogeneous, 1: maximal heterogeneity **CURRE
 lattice_x = 1e4; % --> used only if a lattice is generated
 lattice_y = 1e4; % --> used only if a lattice is generated
 conversion_factor = 0.1; %conversion factor, units of seconds per time point
-single_diffusivity = 1; %0: multiple subregions, 1: uniform lattice
+single_diffusivity_toggle = 1; %0: multiple subregions, 1: uniform lattice
+single_diffusivity = 12500; %value of the diffusivity when constructing a single-diffusivity lattice
 
 % Simulation parameters
 time_pts = 5000; %total time points (absolute time, camera frame-rate)
-n = 10; %number of simulated particles.
-random_start = 0; %0: all particles start at the center of the lattice, 1: particles are each assigned a random start location, -1: all particles start a hard-coded location
+n = 1; %number of simulated particles.
+random_start = 0; %0: all particles start at the center of the lattice, 1: particles are each assigned a random start location, -1: all particles start at a hard-coded location
 
 % Plotting parameters
-multiples_delta_time = [1,5,10,50,100,150,200]; %additional time point intervals for displacement histogram generation (each value corresponds to a histogram)
+% multiples_delta_time = [1,5,10,50,100,150,200]; %additional time point intervals for displacement histogram generation (each value corresponds to a histogram)
+multiples_delta_time = [1,10,100]; %additional time point intervals for displacement histogram generation (each value corresponds to a histogram)
 
-%%% SET UP %%%
+% Workflow parameters
+save_data = 1; %0: no data variables are saved, 1: certain data variables are saved (data_matrix, boundary_collision, all_displacement_storage_x, all_displacement_storage_y)
+
+%%% SET-UP %%%
 % Fetch a lattice
 try
     disp('Attempting to load a pre-existing lattice and associated data.')
@@ -33,7 +38,7 @@ try
 catch
     disp('No pre-existing lattice is available. Generating a new lattice.')
     tic %begin benchmarking
-    [lattice,x,all_cdf,diffusivities] = gen_lattice(save_lattice,heterogeneity,lattice_x,lattice_y,conversion_factor,single_diffusivity);
+    [lattice,x,all_cdf,diffusivities] = gen_lattice(save_lattice,heterogeneity,lattice_x,lattice_y,conversion_factor,single_diffusivity_toggle,single_diffusivity);
     toc %end benchmarking
     disp('Lattice generated successfully.')
 end
@@ -56,59 +61,16 @@ lattice_y = size(lattice,1);
 % Matrix to store all relevant simulation data
 data_matrix = zeros(n,time_pts,2); %for each particle at each time point, store the current x and y coordinates
 
-%%% PARTICLE START LOCATIONS %%%
-% Particle start location
-if random_start == 1
-    % A margin must be set to avoid starting too close to the boundary
-    margin_percent_x = 10; %the particle won't start within 10% of the lattice's x-length from the boundary on both sides (e.g.: lattice_x=10000 --> the particle's starting x-coordinate can be between 1000 and 9000)
-    start_margin_x = round(lattice_x/margin_percent_x);
-    min_start_x = start_margin_x;
-    max_start_x = lattice_x-start_margin_x;
-    
-    % A margin must be set to avoid starting too close to the boundary
-    margin_percent_y = 10; %the particle won't start within 10% of the lattice's y-length from the boundary on both sides (e.g.: lattice_y=10000 --> the particle's starting y-coordinate can be between 1000 and 9000)
-    start_margin_y = round(lattice_y/margin_percent_y);
-    min_start_y = start_margin_y;
-    max_start_y = lattice_y-start_margin_y;
-    
-    % Generate a random start location for each particle
-    for i = 1:n
-        % Select a random start location at a sufficient distance from the boundary
-        x_start = round(min_start_x + (max_start_x-min_start_x).*rand());
-        y_start = round(min_start_y + (max_start_y-min_start_y).*rand());
-        
-        % Set up particle start locations and initial diffusivities
-        data_matrix(i,1,1) = x_start;
-        data_matrix(i,1,2) = y_start;
-    end
-elseif random_start == -1 %for testing purposes
-    %  The particle will start at a specific, hard-coded location
-	x_start = 200;
-    y_start = 200;
-    
-    % Set up particle start locations and initial diffusivities
-	data_matrix(:,1,1) = x_start;
-    data_matrix(:,1,2) = y_start;
-else
-    % The particle will start at the center of the lattice
-    x_start = round(lattice_x/2);
-    y_start = round(lattice_y/2);
-    
-    % Set up particle start locations and initial diffusivities
-    data_matrix(:,1,1) = x_start;
-    data_matrix(:,1,2) = y_start;
-end
-
 %%% WALK SIMULATION %%%
-% Storage for the global histogram of displacements
-current_displacement_storage = zeros(n,time_pts-1);
-
 % Memory of boundary collisions
 boundary_collision = zeros(1,n);
 
 for i = 1:n %iterate through each particle
     disp_message_particle = strcat(['Simulating particle #' num2str(i) '.']);
     disp(disp_message_particle)
+    
+    data_matrix(i,1,:) = start_location(random_start,lattice_x,lattice_y); %set the initial position of the particle
+    
     for j = 2:time_pts %for each particle, iterate through each time point
         try
             current_diffusivity = lattice(data_matrix(i,j-1,1),data_matrix(i,j-1,2));
@@ -123,29 +85,15 @@ for i = 1:n %iterate through each particle
         current_displacement_x = round(get_dispmnt_variation(current_diffusivity)); %randomly select a distance in the x-direction
         current_displacement_y = round(get_dispmnt_variation(current_diffusivity)); %randomly select a distance in the y-direction
         
+        % Update the particle's position
         data_matrix(i,j,1) = data_matrix(i,j-1,1) + current_displacement_x;
         data_matrix(i,j,2) = data_matrix(i,j-1,2) + current_displacement_y;
-        
-%         direction_select = randi(4); %randomly select a direction
-%         
-%         if direction_select == 1 %+x (RIGHT)
-%             data_matrix(i,j,1) = data_matrix(i,j-1,1) + abs(current_displacement);
-%             data_matrix(i,j,2) = data_matrix(i,j-1,2);
-%             current_displacement_storage(i,j-1) = current_displacement;
-%         elseif direction_select == 2 %-x (LEFT)
-%             data_matrix(i,j,1) = data_matrix(i,j-1,1) - abs(current_displacement);
-%             data_matrix(i,j,2) = data_matrix(i,j-1,2);
-%             current_displacement_storage(i,j-1) = -current_displacement;
-%         elseif direction_select == 3 %+y (DOWN)
-%             data_matrix(i,j,1) = data_matrix(i,j-1,1);
-%             data_matrix(i,j,2) = data_matrix(i,j-1,2) + abs(current_displacement);
-%             current_displacement_storage(i,j-1) = -current_displacement;
-%         elseif direction_select == 4 %-y (UP)
-%             data_matrix(i,j,1) = data_matrix(i,j-1,1);
-%             data_matrix(i,j,2) = data_matrix(i,j-1,2) - abs(current_displacement);
-%             current_displacement_storage(i,j-1) = current_displacement;
-%         end
+
     end
+end
+
+if save_data == 1
+    save('walk_data.mat','data_matrix','boundary_collision')
 end
 
 %%% WALK VISUALIZATION %%%
@@ -180,32 +128,6 @@ for i = 1:n
 end
 
 %%% HISTOGRAMS %%%
-% Histogram for all displacements (1*(delta-t))
-% clearvars all_displacement_storage eval_vals hist_obj fit_data_pdf
-% all_displacement_storage = [];
-% for i = 1:n
-%     % Store the processed data for histogram plotting
-%     all_displacement_storage = [all_displacement_storage no_trailing_zeros(current_displacement_storage(i,:))];
-% end
-% 
-% % Plot the histogram
-% figure()
-% hist_obj = histogram(all_displacement_storage, 'Normalization', 'pdf');
-% fit_data = fitdist(all_displacement_storage','Normal'); %obtain fit data
-% 
-% % fit_data = fitdist(all_displacement_storage','Logistic');
-% % fit_data = fitdist(all_displacement_storage','Stable');
-% 
-% eval_vals = (hist_obj.BinEdges(1)-20:0.1:hist_obj.BinEdges(end)+20);
-% fit_data_pdf = pdf(fit_data,eval_vals); %compute the corresponding PDF
-% hold on
-% plot(eval_vals,fit_data_pdf,'LineWidth',2) %overlay the PDF on top of the histogram
-% title('Step Size Distribution')
-% xlabel('\Deltax, \Deltay [10^{-2}\mum]')
-% ylabel('P(\Deltax, \Deltay, \Delta\tau=1 time point)')
-% fit_legend = strcat(['Mean = ' num2str(fit_data.mu) ', Std. Dev. = ' num2str(fit_data.sigma)]);
-% legend('Distribution',fit_legend)
-
 % Histograms for displacements using predefined multiples of delta-t (iteratively: multiples_delta_time*(delta-t))
 histogram_data_x = zeros(n,time_pts,size(multiples_delta_time,2));
 histogram_data_y = zeros(n,time_pts,size(multiples_delta_time,2));
@@ -239,41 +161,19 @@ for j = 1:size(multiples_delta_time,2)
             end
         end
         
-%         % FIRST METHOD (FILTERING) %
-%         current_histogram_data_x = histogram_data_x(i,:,j);
-%         current_histogram_data_y = histogram_data_y(i,:,j);
-%         
-%         current_histogram_data_x_copy = histogram_data_x(i,:,j);
-%         current_histogram_data_y_copy = histogram_data_y(i,:,j);
-% 
-%         current_histogram_data_x((current_histogram_data_x_copy==0 & current_histogram_data_y_copy~=0)) = [];
-%         current_histogram_data_y((current_histogram_data_y_copy==0 & current_histogram_data_x_copy~=0)) = [];
-%         
-%         current_histogram_data_x = no_trailing_zeros(current_histogram_data_x);
-%         current_histogram_data_y = no_trailing_zeros(current_histogram_data_y);
-%         
-%         % Store the processed data for histogram plotting
-%         all_displacement_storage_x = [all_displacement_storage_x current_histogram_data_x];
-%         all_displacement_storage_y = [all_displacement_storage_y current_histogram_data_y];
-        % FIRST METHOD (FILTERING) %
-        
-        % SECOND METHOD (NO FILTERING) %
         % Store the processed data for histogram plotting
         all_displacement_storage_x = [all_displacement_storage_x no_trailing_zeros(histogram_data_x(i,:,j))];
         all_displacement_storage_y = [all_displacement_storage_y no_trailing_zeros(histogram_data_y(i,:,j))];
-        % SECOND METHOD (NO FILTERING) %
         
-        % THIRD METHOD (EVEN LESS FILTERING) %
-        % Store the processed data for histogram plotting
-%         all_displacement_storage_x = [all_displacement_storage_x histogram_data_x(i,:,j)];
-%         all_displacement_storage_y = [all_displacement_storage_y histogram_data_y(i,:,j)];
-        % THIRD METHOD (EVEN LESS FILTERING) %
-        
+    end
+    
+    if save_data == 1
+        save_name_str = strcat(['histograms_all_displacements_' num2str(multiples_delta_time(j)) 'dt.mat']);
+        save(save_name_str,'all_displacement_storage_x','all_displacement_storage_y')
     end
     
     % Combine the direction-specific data for histogram plotting
     all_displacement_storage_both = [all_displacement_storage_x all_displacement_storage_y];
-%     all_displacement_storage_both = all_displacement_storage_x;
     
     % x-direction displacements histogram
     figure()
@@ -469,12 +369,14 @@ end
 % Remove erroneous displacements that result from a particle striking the boundary
 for i = 1:n
     for j = 1:size(delta_taus,2)
-        if boundary_collision(i) == 1 %only modify the displacement data if the given  particle strikes the boundary
-            first_zero_idx = find(((sqd_dispmnts_lag_time(i,:,j)==0)+([diff(sqd_dispmnts_lag_time(i,:,j)) 0]==0))==2,1); %find the index of the two consecutive zeros in sqd_dispmnts_lag_time for the given multiple of delta-t
+        if boundary_collision(i) == 1 %only modify the displacement data if the given particle strikes the boundary
+            start_of_trailing_zeros = find(sqd_dispmnts_lag_time(i,:,j),1,'last') + 1;
             try
-                sqd_dispmnts_lag_time(i,(first_zero_idx-delta_taus(j)):first_zero_idx-1,j) = 0; %remove the appropriate number of erroneous displacements
+                % Remove the appropriate number of erroneous displacements
+                sqd_dispmnts_lag_time(i,(start_of_trailing_zeros-delta_taus(j)):start_of_trailing_zeros-1,j) = 0; 
             catch
-                sqd_dispmnts_lag_time(i,:,j) = 0; %remove all displacements if the particle is immobilized at a time point lesser than the value of the time lag
+                % If the particle stopped so early that all displacements are erroneous, set the enter set of displacements to zero
+                sqd_dispmnts_lag_time(i,:,j) = 0;
             end
         end
     end
@@ -485,8 +387,8 @@ sdlt_plotting = zeros(n,size(delta_taus,2));
 for i = 1:n
     for j = 1:size(delta_taus,2)
         current_particle_tau = sqd_dispmnts_lag_time(i,:,j); %isolate one particle
-        first_zero_idx = find(((sqd_dispmnts_lag_time(i,:,j)==0)+([diff(sqd_dispmnts_lag_time(i,:,j)) 0]==0))==2,1); %find the index of the two consecutive zeros in sqd_dispmnts_lag_time for the given multiple of delta-t
-        current_particle_tau(first_zero_idx:end) = []; %remove all trailing zeros from the data matrix
+        start_of_trailing_zeros = find(sqd_dispmnts_lag_time(i,:,j),1,'last') + 1; %find the index of the two consecutive zeros in sqd_dispmnts_lag_time for the given multiple of delta-t
+        current_particle_tau(start_of_trailing_zeros:end) = []; %remove all trailing zeros from the data matrix
         
         sdlt_plotting(i,j) = mean(current_particle_tau); %compute the mean for the given particle at the given time lag
     end
@@ -499,22 +401,6 @@ for i = 1:n
     hold on
 end
 
-% FIRST METHOD %
-% % Remove trajectories that would break the MSD(delta-tau) curve
-% while any(any(isnan(sdlt_plotting))) %loop as long as there are NaN values in the matrix
-%     for i = 1:size(sdlt_plotting,1) %loop over the current size of the matrix (since rows may be removed, the matrix's size may change with each while loop iteration)
-%         if any(isnan(sdlt_plotting(i,:)))
-%             sdlt_plotting(i,:) = []; %remove rows (particle trajectories) that contain NaN values
-%             break
-%         end
-%     end
-% end
-% 
-% % Set up the plot for the corresponding time-averaged MSD(delta-tau) curve
-% msd_tau_plotting = mean(sdlt_plotting,1);
-% FIRST METHOD
-
-% SECOND METHOD %
 % Convert NaN values (resulting from entirely-zero walks) to zeros to avoid breaking the MSD(delta-tau) curve
 sdlt_plotting(isnan(sdlt_plotting)) = 0;
 
@@ -525,7 +411,6 @@ for i = 1:size(delta_taus,2)
     sdlt_plotting_no_zeros(sdlt_plotting_no_zeros==0) = [];
     msd_tau_plotting(i) = mean(sdlt_plotting_no_zeros);
 end
-% SECOND METHOD %
 
 % Plot the corresponding time-averaged MSD(delta-tau) curve
 plot(msd_tau_plotting,'LineWidth',2,'Color','red')

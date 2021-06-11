@@ -1,4 +1,4 @@
-function [lattice,x,all_cdf,diffusivities] = gen_lattice(save_lattice,heterogeneity,lattice_size_x,lattice_size_y,tau,single_diffusivity)
+function [lattice,x,all_cdf,diffusivities] = gen_lattice(save_lattice,heterogeneity,lattice_size_x,lattice_size_y,tau,single_diffusivity_toggle,single_diffusivity)
 % GEN_LATTICE Generate a lattice environment for diffusion.
 % save_lattice -- 0: don't save, 1: save (save the lattice to a .mat file)
 % heterogeneity -- 0: perfectly homogeneous, 1: maximal heterogeneity
@@ -8,15 +8,15 @@ function [lattice,x,all_cdf,diffusivities] = gen_lattice(save_lattice,heterogene
 % single_diffusivity -- 0: multiple subregions (heterogeneous), 1: uniform lattice (homogeneous)
 
 % Define the lattice (homogeneous or heterogeneous)
-if single_diffusivity == 1
-    lattice = 2500*ones(lattice_size_x,lattice_size_y);
-    diffusivities = 2500;
+if single_diffusivity_toggle == 1
+    lattice = single_diffusivity*ones(lattice_size_x,lattice_size_y);
+    diffusivities = single_diffusivity;
 else
     % Initialize a void lattice
     lattice = zeros(lattice_size_x,lattice_size_y);
 
     % Get the number of diffusivity regions
-    num_regions = 8;
+    num_regions = 10;
 
     % Set diffusivity values for each region (estimated via Wagner et al. Biomacromolecules article)
     min_diffusivity = 0.1; %um^2/s
