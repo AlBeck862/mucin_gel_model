@@ -1,7 +1,6 @@
-function [lattice,x,all_cdf,diffusivities] = gen_lattice(save_lattice,heterogeneity,lattice_size_x,lattice_size_y,tau,single_diffusivity_toggle,single_diffusivity)
+function [lattice,x,all_cdf,diffusivities] = gen_lattice(save_lattice,lattice_size_x,lattice_size_y,tau,single_diffusivity_toggle,single_diffusivity)
 % GEN_LATTICE Generate a lattice environment for diffusion.
 % save_lattice -- 0: don't save, 1: save (save the lattice to a .mat file)
-% heterogeneity -- 0: perfectly homogeneous, 1: maximal heterogeneity
 % lattice_size_x -- size of the lattice along the x-axis (width)
 % lattice_size_y -- size of the lattice along the y-axis (height)
 % tau -- conversion factor: time points to seconds (unit of [seconds per time point])
@@ -16,12 +15,14 @@ else
     lattice = zeros(lattice_size_x,lattice_size_y);
 
     % Get the number of diffusivity regions
-    num_regions = 10;
+    num_regions = 100;
 
     % Set diffusivity values for each region (estimated via Wagner et al. Biomacromolecules article)
-    min_diffusivity = 0.1; %um^2/s
-    max_diffusivity = 1.25; %um^2/s
-
+%     min_diffusivity = 0.1; %um^2/s
+%     max_diffusivity = 1.25; %um^2/s
+    min_diffusivity = 0.05; %um^2/s
+    max_diffusivity = 2.50; %um^2/s
+    
     % Adjust the units of the diffusivities
     multiplier = 10000;
     min_diffusivity = multiplier*min_diffusivity; %10^-4 um^2/s
@@ -51,7 +52,8 @@ else
 end
 
 % Generate the CDF corresponding to each diffusivity value in the lattice
-x = linspace(-165,165,1650000);
+% x = linspace(-165,165,1650000);
+x = linspace(-200,200,2000000);
 all_cdf = zeros(length(diffusivities),length(x));
 for i = 1:length(diffusivities)
     all_cdf(i,:) = gen_PDF(diffusivities(i),tau,x);
@@ -64,7 +66,3 @@ if save_lattice == 1
 end
 
 end
-
-% Unused code
-% lattice_area = lattice_size_x * lattice_size_y;
-% num_regions = subregions(heterogeneity,lattice_area);

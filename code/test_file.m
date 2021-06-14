@@ -418,39 +418,63 @@
 
 %%%%%
 
-try
-    delete(pool)
-end
-
-num = 3; %number of total iterations
-workers = 3; %number of cores
-pool = parpool(workers);
-result = zeros(num,2);
-
-for round = 1:ceil(num/workers)
-    if round*workers<=num
-        val = workers;
-        spmd (val)
-            a = zeros(1,2);
-            disp(labindex)
-            a(1) = round*labindex;
-            a(2) = round*labindex;
-        end
-    else
-        val = rem(num,workers);
-        spmd (val)
-            disp(labindex)
-            a = round*labindex;
-        end
-    end
-    
-%     [a{:}]
-    idx = find(~result,1,'first');
-    for lol = 1:val
-        result(idx+lol-1,:) = [a{lol}];
-    end
-%     clear a
-    
-end
+% try
+%     delete(pool)
+% end
+% 
+% num = 3; %number of total iterations
+% workers = 3; %number of cores
+% pool = parpool(workers);
+% result = zeros(num,2);
+% 
+% for round = 1:ceil(num/workers)
+%     if round*workers<=num
+%         val = workers;
+%         spmd (val)
+%             a = zeros(1,2);
+%             disp(labindex)
+%             a(1) = round*labindex;
+%             a(2) = round*labindex;
+%         end
+%     else
+%         val = rem(num,workers);
+%         spmd (val)
+%             disp(labindex)
+%             a = round*labindex;
+%         end
+%     end
+%     
+% %     [a{:}]
+%     idx = find(~result,1,'first');
+%     for lol = 1:val
+%         result(idx+lol-1,:) = [a{lol}];
+%     end
+% %     clear a
+%     
+% end
 
 %%%%%
+
+num_regions = 100;
+tau = 0.1;
+
+% Set diffusivity values for each region (estimated via Wagner et al. Biomacromolecules article)
+%     min_diffusivity = 0.1; %um^2/s
+%     max_diffusivity = 1.25; %um^2/s
+min_diffusivity = 0.05; %um^2/s
+max_diffusivity = 3.00; %um^2/s
+
+% Adjust the units of the diffusivities
+multiplier = 10000;
+min_diffusivity = multiplier*min_diffusivity; %10^-4 um^2/s
+max_diffusivity = multiplier*max_diffusivity; %10^-4 um^2/s
+
+% Compute the diffusivities of the lattice's subregions
+% diffusivities = min_diffusivity + (max_diffusivity-min_diffusivity).*rand(1,num_regions);
+diffusivities = round(linspace(min_diffusivity,max_diffusivity,num_regions)); % ** MANUALLY FORCED HETEROGENEITY
+
+x = linspace(-200,200,2000000);
+all_cdf = zeros(length(diffusivities),length(x));
+for i = 1:length(diffusivities)
+    all_cdf(i,:) = gen_PDF(diffusivities(i),tau,x);
+end
