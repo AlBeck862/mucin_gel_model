@@ -455,26 +455,26 @@
 
 %%%%%
 
-num_regions = 100;
-tau = 0.1;
-
-% Set diffusivity values for each region (estimated via Wagner et al. Biomacromolecules article)
-%     min_diffusivity = 0.1; %um^2/s
-%     max_diffusivity = 1.25; %um^2/s
-min_diffusivity = 0.05; %um^2/s
-max_diffusivity = 3.00; %um^2/s
-
-% Adjust the units of the diffusivities
-multiplier = 10000;
-min_diffusivity = multiplier*min_diffusivity; %10^-4 um^2/s
-max_diffusivity = multiplier*max_diffusivity; %10^-4 um^2/s
-
-% Compute the diffusivities of the lattice's subregions
-% diffusivities = min_diffusivity + (max_diffusivity-min_diffusivity).*rand(1,num_regions);
-diffusivities = round(linspace(min_diffusivity,max_diffusivity,num_regions)); % ** MANUALLY FORCED HETEROGENEITY
-
-x = linspace(-200,200,2000000);
-all_cdf = zeros(length(diffusivities),length(x));
-for i = 1:length(diffusivities)
-    all_cdf(i,:) = gen_PDF(diffusivities(i),tau,x);
-end
+% num_regions = 100;
+% tau = 0.1;
+% 
+% % Set diffusivity values for each region (estimated via Wagner et al. Biomacromolecules article)
+% %     min_diffusivity = 0.1; %um^2/s
+% %     max_diffusivity = 1.25; %um^2/s
+% min_diffusivity = 0.05; %um^2/s
+% max_diffusivity = 3.00; %um^2/s
+% 
+% % Adjust the units of the diffusivities
+% multiplier = 10000;
+% min_diffusivity = multiplier*min_diffusivity; %10^-4 um^2/s
+% max_diffusivity = multiplier*max_diffusivity; %10^-4 um^2/s
+% 
+% % Compute the diffusivities of the lattice's subregions
+% % diffusivities = min_diffusivity + (max_diffusivity-min_diffusivity).*rand(1,num_regions);
+% diffusivities = round(linspace(min_diffusivity,max_diffusivity,num_regions)); % ** MANUALLY FORCED HETEROGENEITY
+% 
+% x = linspace(-200,200,2000000);
+% all_cdf = zeros(length(diffusivities),length(x));
+% for i = 1:length(diffusivities)
+%     all_cdf(i,:) = gen_PDF(diffusivities(i),tau,x);
+% end

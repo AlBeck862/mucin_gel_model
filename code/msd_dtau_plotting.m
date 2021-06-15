@@ -1,10 +1,11 @@
-function msd_dtau_plotting(n,time_pts,data_matrix,boundary_collision)
+function msd_dtau_plotting(n,time_pts,data_matrix,boundary_collision,conversion_factor,msd_dtau_log)
 % MSD_DTAU_PLOTTING Plot the time-averaged MSD(delta-tau) curve for each
 % particle as well as the ensemble-averaged MSD(delta-tau) curve.
 
-% Time-averaged MSD(delta-tau) plot
+%%% PLOT SET-UP %%%
 delta_taus = 1:(time_pts/10); %time point intervals for displacement measurements (given by the first 10% of time points)
 sqd_dispmnts_lag_time = zeros(n,time_pts,size(delta_taus,2)); %storage for displacements at each time point interval
+rescaled_time = 0.1:0.1:time_pts*conversion_factor; %time in seconds used for more realistic plotting
 
 % Compute the displacements for the given delta-tau values (multiples of delta-t)
 counter_msd_tau = 1;
@@ -35,44 +36,106 @@ for i = 1:n
     end
 end
 
-% Set up the plot for the time-averaged squared displacements versus lag time curves
-sdlt_plotting = zeros(n,size(delta_taus,2));
-for i = 1:n
-    for j = 1:size(delta_taus,2)
-        current_particle_tau = sqd_dispmnts_lag_time(i,:,j); %isolate one particle
-        start_of_trailing_zeros = find(sqd_dispmnts_lag_time(i,:,j),1,'last') + 1; %find the index of the two consecutive zeros in sqd_dispmnts_lag_time for the given multiple of delta-t
-        current_particle_tau(start_of_trailing_zeros:end) = []; %remove all trailing zeros from the data matrix
-        
-        sdlt_plotting(i,j) = mean(current_particle_tau); %compute the mean for the given particle at the given time lag
+%%% LOG-LOG OR LINEAR PLOTTING %%%
+if msd_dtau_log == 1 %logarithmically-scaled plot
+    % Set up the plot for the time-averaged squared displacements versus lag time curves
+    sdlt_plotting = zeros(n,size(delta_taus,2));
+    for i = 1:n
+        for j = 1:size(delta_taus,2)
+            current_particle_tau = sqd_dispmnts_lag_time(i,:,j); %isolate one particle
+            start_of_trailing_zeros = find(sqd_dispmnts_lag_time(i,:,j),1,'last') + 1; %find the index of the two consecutive zeros in sqd_dispmnts_lag_time for the given multiple of delta-t
+            current_particle_tau(start_of_trailing_zeros:end) = []; %remove all trailing zeros from the data matrix
+
+            sdlt_plotting(i,j) = mean(current_particle_tau); %compute the mean for the given particle at the given time lag
+        end
     end
+
+    % Plot the time-averaged squared displacements versus lag time curves
+    figure()
+    for i = 1:n
+        clearvars sdlt_plotting_particle
+        sdlt_plotting_particle = sdlt_plotting(i,:);
+        sdlt_plotting_particle = no_trailing_zeros(sdlt_plotting_particle); %remove trailing (excess) zeros if a given walk ended early
+        sdlt_plotting_particle = log10(sdlt_plotting_particle/conversion_factor);
+        loglog(rescaled_time(1:length(sdlt_plotting_particle)),sdlt_plotting_particle)
+        hold on
+    end
+
+    % Convert NaN values (resulting from entirely-zero walks) to zeros to avoid breaking the MSD(delta-tau) curve
+    sdlt_plotting(isnan(sdlt_plotting)) = 0;
+
+    % Set up the plot for the corresponding time-averaged MSD(delta-tau) curve
+    msd_tau_plotting = zeros(1,size(delta_taus,2));
+    for i = 1:size(delta_taus,2)
+        sdlt_plotting_no_zeros = sdlt_plotting(:,i);
+        sdlt_plotting_no_zeros(sdlt_plotting_no_zeros==0) = [];
+        msd_tau_plotting(i) = mean(sdlt_plotting_no_zeros);
+    end
+
+    % Plot the corresponding time-averaged MSD(delta-tau) curve
+    msd_tau_plotting = log10(msd_tau_plotting/conversion_factor);
+    loglog(rescaled_time(1:length(sdlt_plotting_particle)),msd_tau_plotting,'LineWidth',2,'Color','red')
+
+else %linearly-scaled plot
+    % Set up the plot for the time-averaged squared displacements versus lag time curves
+    sdlt_plotting = zeros(n,size(delta_taus,2));
+    for i = 1:n
+        for j = 1:size(delta_taus,2)
+            current_particle_tau = sqd_dispmnts_lag_time(i,:,j); %isolate one particle
+            start_of_trailing_zeros = find(sqd_dispmnts_lag_time(i,:,j),1,'last') + 1; %find the index of the two consecutive zeros in sqd_dispmnts_lag_time for the given multiple of delta-t
+            current_particle_tau(start_of_trailing_zeros:end) = []; %remove all trailing zeros from the data matrix
+            sdlt_plotting(i,j) = mean(current_particle_tau); %compute the mean for the given particle at the given time lag
+        end
+    end
+
+    % Plot the time-averaged squared displacements versus lag time curves
+    figure()
+    for i = 1:n
+        clearvars sdlt_plotting_particle
+        sdlt_plotting_particle = sdlt_plotting(i,:);
+        sdlt_plotting_particle = no_trailing_zeros(sdlt_plotting_particle); %remove trailing (excess) zeros if a given walk ended early
+        plot(rescaled_time(1:length(sdlt_plotting_particle)),sdlt_plotting_particle/conversion_factor)
+        hold on
+    end
+
+    % Convert NaN values (resulting from entirely-zero walks) to zeros to avoid breaking the MSD(delta-tau) curve
+    sdlt_plotting(isnan(sdlt_plotting)) = 0;
+
+    % Set up the plot for the corresponding time-averaged MSD(delta-tau) curve
+    msd_tau_plotting = zeros(1,size(delta_taus,2));
+    for i = 1:size(delta_taus,2)
+        sdlt_plotting_no_zeros = sdlt_plotting(:,i);
+        sdlt_plotting_no_zeros(sdlt_plotting_no_zeros==0) = [];
+        msd_tau_plotting(i) = mean(sdlt_plotting_no_zeros);
+    end
+
+    % Plot the corresponding time-averaged MSD(delta-tau) curve
+    plot(rescaled_time(1:length(sdlt_plotting_particle)),msd_tau_plotting/conversion_factor,'LineWidth',2,'Color','red')
 end
 
-% Plot the time-averaged squared displacements versus lag time curves
-figure()
-for i = 1:n
-    plot(sdlt_plotting(i,:))
-    hold on
-end
-
-% Convert NaN values (resulting from entirely-zero walks) to zeros to avoid breaking the MSD(delta-tau) curve
-sdlt_plotting(isnan(sdlt_plotting)) = 0;
-
-% Set up the plot for the corresponding time-averaged MSD(delta-tau) curve
-msd_tau_plotting = zeros(1,size(delta_taus,2));
-for i = 1:size(delta_taus,2)
-    sdlt_plotting_no_zeros = sdlt_plotting(:,i);
-    sdlt_plotting_no_zeros(sdlt_plotting_no_zeros==0) = [];
-    msd_tau_plotting(i) = mean(sdlt_plotting_no_zeros);
-end
-
-% Plot the corresponding time-averaged MSD(delta-tau) curve
-plot(msd_tau_plotting,'LineWidth',2,'Color','red')
+%%% ALL PLOTTING %%%
 title('Time-Averaged Squared Displacement vs. Lag Time')
-xlabel('Lag Time \Delta\tau [simulation time points]')
+xlabel('Lag Time \Delta\tau [s]')
 ylabel('Time-Averaged MSD(\Delta\tau) [(10^{-2}\mum)^2]')
 
-% Fetch the line of best fit for the MSD(tau)
-msd_tau_fit = polyfit(log10(delta_taus(1:end/2)),log10(msd_tau_plotting(1:end/2)),1);
-disp(msd_tau_fit)
+%%% LINE OF BEST FIT %%%
+if msd_dtau_log == 1
+    msd_tau_fit = polyfit(log10(delta_taus(1:end/2)),msd_tau_plotting(1:end/2),1);
+else
+    msd_tau_fit = polyfit(log10(delta_taus(1:end/2)),log10(msd_tau_plotting(1:end/2)),1);
+end
+
+slope_disp_str = strcat(['Slope of the log-log line of best fit: ' num2str(msd_tau_fit(1))]);
+intercept_disp_str = strcat(['Intercept of the log-log line of best fit: ' num2str(msd_tau_fit(2))]);
+disp(slope_disp_str)
+disp(intercept_disp_str)
+
+% % Plot the line of best fit if the plot is scaled logarithmically
+% if msd_dtau_log == 1
+%     x_limits = xlim;
+%     x_lbf = linspace(x_limits(1),x_limits(end),1000);
+%     y_lbf = msd_tau_fit(1)*x_lbf + msd_tau_fit(end);
+%     loglog(x_lbf,y_lbf);
+% % end
 
 end

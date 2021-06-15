@@ -1,0 +1,12 @@
+Lattice units: 10^-2 um scaling
+Lattice parameters: single diffusivity, D=2500
+Number of walks: 5
+Time points (each particle): 5000
+Random start locations: no
+
+histogram_1dt_dx: normalized histogram of displacements in the x-direction for 1*delta-t
+histogram_1dt_dy: normalized histogram of displacements in the y-direction for 1*delta-t
+
+msd_dtau: squared displacement versus lag time curves + time-averaged MSD(dtau) curve
+
+Note: all histogram fits are Gaussian.
