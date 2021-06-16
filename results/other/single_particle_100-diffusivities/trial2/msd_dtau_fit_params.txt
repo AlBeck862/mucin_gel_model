@@ -1,0 +1,3 @@
+MSD_dtau line of best fit parameters (log-log):
+Slope --> 0.89262
+Intercept --> 4.6872

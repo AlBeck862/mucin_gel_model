@@ -16,8 +16,8 @@ single_diffusivity_toggle = 0; %0: multiple subregions, 1: uniform lattice
 single_diffusivity = 2500; %value of the diffusivity when constructing a single-diffusivity lattice
 
 % Simulation parameters
-time_pts = 200; %total time points (absolute time, camera frame-rate)
-n = 3; %number of simulated particles.
+time_pts = 15000; %total time points (absolute time, camera frame-rate)
+n = 1; %number of simulated particles.
 random_start = 0; %0: all particles start at the center of the lattice, 1: particles are each assigned a random start location, -1: all particles start at a hard-coded location
 
 % Plotting parameters

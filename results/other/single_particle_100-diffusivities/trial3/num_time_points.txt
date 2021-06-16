@@ -1,0 +1,1 @@
+Just under 15,000 time points (particle struck the boundary towards the end of the planned simulation time)
