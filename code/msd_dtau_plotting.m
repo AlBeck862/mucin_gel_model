@@ -3,7 +3,8 @@ function msd_dtau_plotting(n,time_pts,data_matrix,boundary_collision,conversion_
 % particle as well as the ensemble-averaged MSD(delta-tau) curve.
 
 %%% PLOT SET-UP %%%
-delta_taus = 1:(time_pts/10); %time point intervals for displacement measurements (given by the first 10% of time points)
+time_fraction = 1/3; %fraction of the total number of time points over which to generate the curve
+delta_taus = 1:round(time_pts*time_fraction); %time point intervals for displacement measurements
 sqd_dispmnts_lag_time = zeros(n,time_pts,size(delta_taus,2)); %storage for displacements at each time point interval
 rescaled_time = 0.1:0.1:time_pts*conversion_factor; %time in seconds used for more realistic plotting
 
@@ -94,7 +95,8 @@ else %linearly-scaled plot
         clearvars sdlt_plotting_particle
         sdlt_plotting_particle = sdlt_plotting(i,:);
         sdlt_plotting_particle = no_trailing_zeros(sdlt_plotting_particle); %remove trailing (excess) zeros if a given walk ended early
-        plot(rescaled_time(1:length(sdlt_plotting_particle)),sdlt_plotting_particle/conversion_factor)
+        sdlt_plotting_particle = sdlt_plotting_particle/conversion_factor;
+        plot(rescaled_time(1:length(sdlt_plotting_particle)),sdlt_plotting_particle)
         hold on
     end
 
@@ -110,7 +112,8 @@ else %linearly-scaled plot
     end
 
     % Plot the corresponding time-averaged MSD(delta-tau) curve
-    plot(rescaled_time(1:length(sdlt_plotting_particle)),msd_tau_plotting/conversion_factor,'LineWidth',2,'Color','red')
+    msd_tau_plotting = msd_tau_plotting/conversion_factor;
+    plot(rescaled_time(1:length(sdlt_plotting_particle)),msd_tau_plotting,'LineWidth',2,'Color','red')
 end
 
 %%% ALL PLOTTING %%%
@@ -120,9 +123,9 @@ ylabel('Time-Averaged MSD(\Delta\tau) [(10^{-2}\mum)^2]')
 
 %%% LINE OF BEST FIT %%%
 if msd_dtau_log == 1
-    msd_tau_fit = polyfit(log10(delta_taus(1:end/2)),msd_tau_plotting(1:end/2),1);
+    msd_tau_fit = polyfit(log10(delta_taus),msd_tau_plotting,1);
 else
-    msd_tau_fit = polyfit(log10(delta_taus(1:end/2)),log10(msd_tau_plotting(1:end/2)),1);
+    msd_tau_fit = polyfit(log10(delta_taus),log10(msd_tau_plotting),1);
 end
 
 slope_disp_str = strcat(['Slope of the log-log line of best fit: ' num2str(msd_tau_fit(1))]);
@@ -130,12 +133,40 @@ intercept_disp_str = strcat(['Intercept of the log-log line of best fit: ' num2s
 disp(slope_disp_str)
 disp(intercept_disp_str)
 
-% % Plot the line of best fit if the plot is scaled logarithmically
-% if msd_dtau_log == 1
-%     x_limits = xlim;
-%     x_lbf = linspace(x_limits(1),x_limits(end),1000);
-%     y_lbf = msd_tau_fit(1)*x_lbf + msd_tau_fit(end);
-%     loglog(x_lbf,y_lbf);
-% % end
+%%% SEGMENTED LINES OF BEST FIT %%%
+log_times = log10(rescaled_time(1:length(sdlt_plotting_particle)));
+segments = rescaled_time(log_times==round(log_times)); %get all the powers of ten seconds
+
+% For each lag time segment bounded by a power of ten seconds, compute the parameters of a line of best fit
+for i = 1:length(segments)
+    try
+        if msd_dtau_log == 1
+            msd_tau_fit_segment = polyfit(log10(delta_taus(find(rescaled_time==segments(i)):find(rescaled_time==segments(i+1)))),msd_tau_plotting(find(rescaled_time==segments(i)):find(rescaled_time==segments(i+1))),1);
+        else
+            msd_tau_fit_segment = polyfit(log10(delta_taus(find(rescaled_time==segments(i)):find(rescaled_time==segments(i+1)))),log10(msd_tau_plotting(find(rescaled_time==segments(i)):find(rescaled_time==segments(i+1)))),1);
+        end
+        
+        slope_disp_str = strcat(['Slope of the log-log line of best fit (' num2str(segments(i)) 's - ' num2str(segments(i+1)) 's' '): ' num2str(msd_tau_fit_segment(1))]);
+        intercept_disp_str = strcat(['Intercept of the log-log line of best fit: (' num2str(segments(i)) 's - ' num2str(segments(i+1)) 's' '): ' num2str(msd_tau_fit_segment(2))]);
+    catch %used for the final segment (from the final segment value in "segments" to the end of the lag time range)
+        if length(log_times)-(segments(end)/conversion_factor) < 10 %ignore this final segment if there are too few data points for it to be representative of a trend (the minimum is hard-coded to ten data points)
+            disp('NOTE. The final bracket is too small to attempt a slope and intercept estimate.')
+            break
+        else
+            if msd_dtau_log == 1
+                msd_tau_fit_segment = polyfit(log10(delta_taus(find(rescaled_time==segments(i)):end)),msd_tau_plotting(find(rescaled_time==segments(i)):end),1);
+            else
+                msd_tau_fit_segment = polyfit(log10(delta_taus(find(rescaled_time==segments(i)):end)),log10(msd_tau_plotting(find(rescaled_time==segments(i)):end)),1);
+            end
+
+            slope_disp_str = strcat(['Slope of the log-log line of best fit (' num2str(segments(i)) 's - end): ' num2str(msd_tau_fit_segment(1))]);
+            intercept_disp_str = strcat(['Intercept of the log-log line of best fit: (' num2str(segments(i)) 's - end): ' num2str(msd_tau_fit_segment(2))]);
+        end
+    end
+    
+    disp(slope_disp_str)
+    disp(intercept_disp_str)
+    
+end
 
 end
