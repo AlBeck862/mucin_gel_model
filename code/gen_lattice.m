@@ -15,7 +15,7 @@ else
     lattice = zeros(lattice_size_x,lattice_size_y);
 
     % Get the number of diffusivity regions
-    num_regions = 100;
+    num_regions = 25;
 
     % Set diffusivity values for each region (estimated via Wagner et al. Biomacromolecules article)
     min_diffusivity = 0.1; %um^2/s

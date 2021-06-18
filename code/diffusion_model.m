@@ -18,13 +18,13 @@ single_diffusivity = 2500; %value of the diffusivity when constructing a single-
 % Simulation parameters
 time_pts = 5000; %total time points (absolute time, camera frame-rate)
 n = 10; %number of simulated particles.
-random_start = 0; %0: all particles start at the center of the lattice, 1: particles are each assigned a random start location, -1: all particles start at a hard-coded location
+random_start = 1; %0: all particles start at the center of the lattice, 1: particles are each assigned a random start location, -1: all particles start at a hard-coded location
 
 % Plotting parameters
 % multiples_delta_time = [1,5,10,50,100,150,200]; %additional time point intervals for displacement histogram generation (each value corresponds to a set of two histograms (x-direction and y-direction)
 multiples_delta_time = [1,10,100]; %additional time point intervals for displacement histogram generation (each value corresponds to a set of two histograms (x-direction and y-direction)
 msd_dtau_log = 1; %0: MSD(delta-tau) plots will be linearly scaled, 1: MSD(delta-tau) plots will be logarithmically scaled (this does not affect the line-of-best-fit parameters)
-moving_avg_kernel = 200; %size of the window over which to average the displacement data when plotting step-size over time
+moving_avg_kernel = round(time_pts/100); %size of the window over which to average the displacement data when plotting step-size over time
 
 % Workflow parameters
 save_data = 0; %0: no data variables are saved, 1: certain data variables are saved (data_matrix, boundary_collision, all_displacement_storage_x, all_displacement_storage_y)
@@ -81,7 +81,7 @@ msd_dt_plotting(n,time_pts,data_matrix)
 %%% TIME-AVERAGED MSD(DELTA-TAU) %%%
 msd_dtau_plotting(n,time_pts,data_matrix,boundary_collision,conversion_factor,msd_dtau_log)
 
-%%% STEP-SIZE OVER TIME %%%
-stepsize_dt_plotting(n,data_matrix,moving_avg_kernel)
+%%% STEP-SIZE OVER TIME & DIFFUSIVITY FREQUENCIES %%%
+stepsize_dt_plotting(n,data_matrix,lattice,moving_avg_kernel)
 
 toc %end benchmarking (entire script)

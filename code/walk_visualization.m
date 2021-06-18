@@ -1,7 +1,6 @@
 function walk_visualization(n,lattice,data_matrix)
 % WALK_VISUALIZATION Plot the random walk of each simulated particle.
 
-
 if length(unique(lattice)) == 1
     lattice_visualization = rescale(lattice,1,1);
 else
@@ -11,6 +10,8 @@ end
 lattice_visualization = fliplr(rot90(lattice_visualization,-1));
 
 for i = 1:n
+    pause(1)
+    
     figure()
     imshow(lattice_visualization)
     hold on

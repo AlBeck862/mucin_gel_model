@@ -75,7 +75,7 @@ if msd_dtau_log == 1 %logarithmically-scaled plot
 
     % Plot the corresponding time-averaged MSD(delta-tau) curve
     msd_tau_plotting = log10(msd_tau_plotting/conversion_factor);
-    loglog(rescaled_time(1:length(sdlt_plotting_particle)),msd_tau_plotting,'LineWidth',2,'Color','red')
+    loglog(rescaled_time(1:length(msd_tau_plotting)),msd_tau_plotting,'LineWidth',2,'Color','red')
 
 else %linearly-scaled plot
     % Set up the plot for the time-averaged squared displacements versus lag time curves
