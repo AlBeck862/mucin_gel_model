@@ -40,33 +40,37 @@ for i = 1:n
     ytips = bar_data(1).YEndPoints;
     labels = string(bar_data(1).YData);
     text(xtips,ytips,labels,'HorizontalAlignment','center','VerticalAlignment','bottom')
-    xlabel('Diffusivity [(10^{-2}\mum)^2/s]')
+    diff_title_str = strcat(['Frequency of Diffusivities (Particle #' num2str(i) ')']);
+    title(diff_title_str)
+    xlabel('Diffusivity [(10^{-4}\mum)^2/s]')
     ylabel('Frequency')
     grid on
     
     % Plot of the x-direction step-sizes of the current particle (corresponding diffusivities are overlaid)
     figure()
     plot(movmean(stepsizes_x,moving_avg_kernel))
-    title('Step-Size (x-direction) and Diffusivity vs. Absolute Time')
+    x_dir_title_str = strcat(['Step-Size (x-direction) and Diffusivity vs. Absolute Time (Particle #' num2str(i) ')']);
+    title(x_dir_title_str)
     xlabel('Absolute Time [time points]')
     ylabel('Step-Size |x| [(10^{-2}\mum)]')
     
     yyaxis right
     plot(current_particle_diffs)
 %     plot(movmean(current_particle_diffs,moving_avg_kernel))
-    ylabel('Diffusivity [(10^{-2}\mum)^2/s]')
+    ylabel('Diffusivity [(10^{-4}\mum)^2/s]')
     
     % Plot of the y-direction step-sizes of the current particle (corresponding diffusivities are overlaid)
     figure()
     plot(movmean(stepsizes_y,moving_avg_kernel))
-    title('Step-Size (y-direction) and Diffusivity vs. Absolute Time')
+    y_dir_title_str = strcat(['Step-Size (y-direction) and Diffusivity vs. Absolute Time (Particle #' num2str(i) ')']);
+    title(y_dir_title_str)
     xlabel('Absolute Time [time points]')
     ylabel('Step-Size |y| [(10^{-2}\mum)]')
     
 	yyaxis right
     plot(current_particle_diffs)
 %     plot(movmean(current_particle_diffs,moving_avg_kernel))
-    ylabel('Diffusivity [(10^{-2}\mum)^2/s]')
+    ylabel('Diffusivity [(10^{-4}\mum)^2/s]')
     
 end
 

@@ -49,6 +49,16 @@ if visualize_lattice == 1
     imshow(lattice_visualization)
 end
 
+%%%% PARALLEL COMPUTING TESTS (PARFEVAL) %%%%
+% workers = 3; %number of simulations to compute simultaneously (restricted to the number of CPU cores)
+% 
+% for worker = 1:workers
+%     sim_results(worker) = parfeval(@walk_simulation,2,n,time_pts,random_start,lattice,save_data);
+% end
+% 
+% delete(pool)
+%%% %%% %%% %%% %%% %%% %%% %%% %%%
+
 % Failsafe in case a loaded lattice's settings don't match those of the current lattice size
 lattice_x = size(lattice,2);
 lattice_y = size(lattice,1);

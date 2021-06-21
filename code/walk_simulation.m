@@ -7,8 +7,8 @@ function [data_matrix,boundary_collision] = walk_simulation(n,time_pts,random_st
 tic %begin benchmarking (particle simulation)
 
 % Failsafe in case a loaded lattice's settings don't match those of the current lattice size
-lattice_x = size(lattice,2);
-lattice_y = size(lattice,1);
+lattice_x = size(lattice,1);
+lattice_y = size(lattice,2);
 
 % Matrix to store all relevant simulation data
 data_matrix = zeros(n,time_pts,2); %for each particle at each time point, store the current x and y coordinates

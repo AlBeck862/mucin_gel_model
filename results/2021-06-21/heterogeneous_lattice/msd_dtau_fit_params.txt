@@ -1,0 +1,15 @@
+MSD_dtau line of best fit parameters (log-log):
+Slope of the log-log line of best fit: 0.96985
+Intercept of the log-log line of best fit: 4.5268
+
+Slope of the log-log line of best fit (0.1s - 1s): 1.0116
+Intercept of the log-log line of best fit: (0.1s - 1s): 4.3731
+
+Slope of the log-log line of best fit (1s - 10s): 0.9938
+Intercept of the log-log line of best fit: (1s - 10s): 4.414
+
+Slope of the log-log line of best fit (10s - 100s): 1.1257
+Intercept of the log-log line of best fit: (10s - 100s): 4.165
+
+Slope of the log-log line of best fit (100s - end): 1.1277
+Intercept of the log-log line of best fit: (100s - end): 3.9709

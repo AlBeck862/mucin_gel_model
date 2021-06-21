@@ -28,6 +28,8 @@ for i = 1:n
     plot(current_particle_x(1),current_particle_y(1),'>g','MarkerFaceColor','g','MarkerSize',10) %mark the start point
     plot(current_particle_x(end),current_particle_y(end),'sr','MarkerFaceColor','r','MarkerSize',10) %mark the end point
     legend('Particle Trajectory','Start','End')
+    title_str = strcat(['Particle Trajectory (Particle #' num2str(i) ')']);
+    title(title_str)
     
     clearvars current_particle_x current_particle_y %clear variables for the next loop iteration
 end

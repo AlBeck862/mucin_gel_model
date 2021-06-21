@@ -1,6 +1,6 @@
 Lattice units: 10^-2 um scaling
 Lattice parameters: 25 diffusivity subregions (linearly spaced, 0.1-1.25 um2/s)
-Number of walks: 10
+Number of walks: 10 (visualizations stored in the "walks" subfolder)
 Time points (each particle): 5000
 Random start locations: yes
 
