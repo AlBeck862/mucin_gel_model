@@ -1,0 +1,62 @@
+MSD_dtau line of best fit parameters (linear):
+Slope of the line of best fit: 1.0389
+Intercept of the line of best fit: 0.38417
+
+Slope of theline of best fit (0.1s - 1s): 1.0022
+Intercept of the line of best fit: (0.1s - 1s): -0.0011417
+
+Slope of the line of best fit (1s - 10s): 1.0152
+Intercept of the line of best fit: (1s - 10s): 0.27053
+
+Slope of the line of best fit (10s - 100s): 1.0642
+Intercept of the line of best fit: (10s - 100s): -14.8234
+
+Slope of the line of best fit (100s - end): 0.93245
+Intercept of the line of best fit: (100s - end): 144.3678
+
+**********
+NEW METHOD (entire curve):
+Diffusion constant from the line of best fit (particle #1): 0.27119
+Alpha from the line of best fit (particle #1): 1
+
+Diffusion constant from the line of best fit (particle #2): 0.39612
+Alpha from the line of best fit (particle #2): 0.90252
+
+Diffusion constant from the line of best fit (particle #3): 0.28586
+Alpha from the line of best fit (particle #3): 1
+
+Diffusion constant from the line of best fit (particle #4): 0.29897
+Alpha from the line of best fit (particle #4): 1
+
+Diffusion constant from the line of best fit (particle #5): 0.30036
+Alpha from the line of best fit (particle #5): 0.94913
+
+Diffusion constant from the line of best fit (particle #6): 0.43111
+Alpha from the line of best fit (particle #6): 1
+
+Diffusion constant from the line of best fit (particle #7): 0.55508
+Alpha from the line of best fit (particle #7): 0.7808
+
+Diffusion constant from the line of best fit (particle #8): 0.32134
+Alpha from the line of best fit (particle #8): 0.98786
+
+Diffusion constant from the line of best fit (particle #9): 0.6963
+Alpha from the line of best fit (particle #9): 0.77685
+
+Diffusion constant from the line of best fit (particle #10): 0.4007
+Alpha from the line of best fit (particle #10): 0.92215
+
+Diffusion constant from the line of best fit: 0.25868
+Alpha from the line of best fit: 1
+
+Diffusion constant from the line of best fit (0.1s - 1s): 0.25084
+Alpha from the line of best fit: (0.1s - 1s): 0.99926
+
+Diffusion constant from the line of best fit (1s - 10s): 0.2551
+Alpha from the line of best fit: (1s - 10s): 1
+
+Diffusion constant from the line of best fit (10s - 100s): 0.25757
+Alpha from the line of best fit: (10s - 100s): 1
+
+Diffusion constant from the line of best fit (100s - end): 0.55092
+Alpha from the line of best fit: (100s - end): 0.89588

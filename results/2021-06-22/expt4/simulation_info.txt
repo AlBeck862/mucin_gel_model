@@ -1,0 +1,21 @@
+Lattice units: 10^-2 um scaling
+Lattice parameters: 25-diffusivities lattice (0.1 - 1.25 um^2/s, linearly distributed)
+Number of walks: 10
+Time points (each particle): 5000
+Random start locations: yes
+
+histogram_1dt_dx: normalized histogram of displacements in the x-direction for 1*delta-t
+histogram_10dt_dx: normalized histogram of displacements in the x-direction for 10*delta-t
+histogram_100dt_dx: normalized histogram of displacements in the x-direction for 100*delta-t
+
+histogram_1dt_dy: normalized histogram of displacements in the y-direction for 1*delta-t
+histogram_10dt_dy: normalized histogram of displacements in the y-direction for 10*delta-t
+histogram_100dt_dy: normalized histogram of displacements in the y-direction for 100*delta-t
+
+msd_dt: squared displacement versus absolute time curves + MSD(dt) curve
+msd_dtau: squared displacement versus lag time curves + time-averaged MSD(dtau) curve plotted on a log-log graph
+
+step_sizes: folder of step-size plots for certain individual particles
+diffusivity_bar_plots: folder of bar plots of the frequency of each unique diffusivity encountered by certain individual particles
+
+Note: all histogram fits are Gaussian.

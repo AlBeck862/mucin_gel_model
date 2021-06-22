@@ -1,0 +1,13 @@
+function f = msd_dtau_fxn(x,lagT,msd)
+
+for i=1:1:length(lagT)
+    msd_fit(i) = 4*exp(-abs(x(1)))*lagT(i)^exp(-abs(x(2)));    
+    %msd_fit(i) = 4*x(1)*lagT(i)^x(2); 
+end
+
+%f = sum((msd-msd_fit).^2);
+
+f = sum((log(msd+1)-log(msd_fit+1)).^2);
+
+end
+
