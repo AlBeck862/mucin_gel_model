@@ -478,3 +478,247 @@
 % for i = 1:length(diffusivities)
 %     all_cdf(i,:) = gen_PDF(diffusivities(i),tau,x);
 % end
+
+%%%%%
+
+% fh = figure;
+% imageh = imshow(false(1000));
+% 
+% % Create buttons in the figure.
+% uicontrol('Parent',fh,'Style','pushbutton','String','paint','Callback',{@paintButtonCallback, imageh});
+% bh = uicontrol('Parent',fh,'Style','pushbutton','String','line','Callback',{@lineButtonCallback, imageh});
+% bh.Position(2) = 50;
+% bh2 = uicontrol('Parent',fh,'Style','pushbutton','String','line2','Callback',{@line2ButtonCallback, imageh});
+% bh2.Position(2) = 80;
+% bh3 = uicontrol('Parent',fh,'Style','pushbutton','String','free','Callback',{@freeButtonCallback, imageh});
+% bh3.Position(2) = 110;
+% 
+% % button callback function
+% function paintButtonCallback(obj,~,imageh)
+% if isempty(obj.Tag)
+%     imageh.ButtonDownFcn = @paintMode;
+%     obj.Tag = 'on';
+% else
+%     imageh.ButtonDownFcn = '';
+%     obj.Tag = '';
+% end
+% 
+%     function paintMode(~,~)
+%         [x,y] = ginput(1);
+% 
+%         % round the values so they can be used for indexing.
+%         x = round(x);
+%         y = round(y);
+% 
+%         % make sure the values do not go outside the image.
+%         s = size(imageh.CData);
+%         if x > s(2) || y > s(1) || x < 1 || y < 1
+%             return
+%         end
+% 
+%         % make the selected pixel white.
+%         imageh.CData(y,x) = true;
+%     end
+% end
+% 
+% % button callback function
+% function lineButtonCallback(~,~,imageh)
+% % take two points at a time
+% [x,y] = ginput(2);
+% 
+% % make sure the values do not go outside the image.
+% s = size(imageh.CData);
+% if any(x > s(2)+0.5 | y > s(1)+0.5 | x < 0.5 | y < 0.5) || (diff(x) == 0 && diff(y) == 0)
+%     return
+% end
+% 
+% % find all pixels on the line xy
+% ind = findLine(size(imageh.CData),x,y);
+% 
+% % make the selected pixel white.
+% imageh.CData(ind) = true;
+% end
+% 
+% function ind = findLine(s,x,y)
+% % Find all pixels that lie between points defined by [x(1),y(1)] and [x(2),y(2)].
+% 
+% supersampling = 1.2;
+% [x,y,~] = improfile(s,round(x),round(y),max([diff(x);diff(y)])*supersampling);
+% ind = sub2ind(s,round(x),round(y));
+% end
+% 
+% % button callback function
+% function line2ButtonCallback(~,~,imageh)
+% % take two points at a time
+% h = drawline;
+% ind = h.createMask;
+% delete(h);
+% 
+% % make the selected pixel white.
+% imageh.CData(ind) = true;
+% end
+% 
+% % button callback function
+% function freeButtonCallback(~,~,imageh)
+% % take two points at a time
+% h = drawfreehand;
+% x = h.Position(:,1);
+% y = h.Position(:,2);
+% delete(h);
+% 
+% ind = sub2ind(size(imageh.CData),round(y),round(x));
+% 
+% % make the selected pixel white.
+% imageh.CData(ind) = true;
+% end
+
+%%%%%
+
+% fontSize = 12;
+% 
+% % Read in a standard MATLAB gray scale demo image.
+% folder = fullfile(matlabroot, '\toolbox\images\imdemos');
+% baseFileName = 'cameraman.tif';
+% % Get the full filename, with path prepended.
+% fullFileName = fullfile(folder, baseFileName);
+% % Check if file exists.
+% if ~exist(fullFileName, 'file')
+%   % File doesn't exist -- didn't find it there.  Check the search path for it.
+%   fullFileName = baseFileName; % No path this time.
+%   if ~exist(fullFileName, 'file')
+%     % Still didn't find it.  Alert user.
+%     errorMessage = sprintf('Error: %s does not exist in the search path folders.', fullFileName);
+%     uiwait(warndlg(errorMessage));
+%     return;
+%   end
+% end
+% % grayImage = imread(fullFileName);
+% grayImage = 0.5*ones(1000,1000);
+% imshow(grayImage, []);
+% axis on;
+% title('Original Grayscale Image', 'FontSize', fontSize);
+% set(gcf, 'Position', get(0,'Screensize')); % Maximize figure.
+% message = sprintf('Left click and hold to begin drawing a freehand path.\nSimply lift the mouse button to finish.\nDRAW FAST!!!');
+% uiwait(msgbox(message));
+% % User draws curve on image here.
+% hFH = imfreehand();
+% % Get the xy coordinates of where they drew.
+% xy = hFH.getPosition
+% % get rid of imfreehand remnant.
+% delete(hFH);
+% % Overlay what they drew onto the image.
+% hold on; % Keep image, and direction of y axis.
+% xCoordinates = xy(:, 1);
+% yCoordinates = xy(:, 2);
+% plot(xCoordinates, yCoordinates, 'ro', 'LineWidth', 2, 'MarkerSize', 10);
+% caption = sprintf('Original Grayscale Image.\nPoints may not lie on adjacent pixels, depends on your speed of drawing!');
+% title(caption, 'FontSize', fontSize);
+% % Ask user if they want to burn the line into the image.
+% promptMessage = sprintf('Do you want to burn the line into the image?');
+% titleBarCaption = 'Continue?';
+% button = questdlg(promptMessage, titleBarCaption, 'Yes', 'No', 'Yes');
+% if strcmpi(button, 'Yes')
+%   cla;
+%   hold off;
+%   for k = 1 : length(xCoordinates)
+%     row = int32(yCoordinates(k));
+%     column = int32(xCoordinates(k));
+%     
+%     row(row<1)=1;
+%     column(column<1)=1;
+%     
+%     grayImage(row, column) = 255;
+%   end
+%   imshow(grayImage, []);
+%   axis on;
+%   caption = sprintf('Grayscale Image with Burned In Curve.\nPoints may not lie on adjacent pixels, depends on your speed of drawing!');
+%   title(caption, 'FontSize', fontSize);
+% end
+% % Ask user if they want to interpolate the line to get the "in-between" points that are missed..
+% % promptMessage = sprintf('Do you want to interpolate the curve into intervening pixels?');
+% % titleBarCaption = 'Continue?';
+% % button = questdlg(promptMessage, titleBarCaption, 'Yes', 'No', 'Yes');
+% % if strcmpi(button, 'Cancel')
+% %   return;
+% % end
+% xCoordinates = xy(:, 1);
+% yCoordinates = xy(:, 2);
+% numberOfKnots = length(xCoordinates);
+% % Close gaps that you get when you draw too fast.
+% % Use splines to interpolate a smoother curve,
+% % with 10 times as many points,
+% % that goes exactly through the same data points.
+% samplingRateIncrease = 10;
+% newXSamplePoints = linspace(1, numberOfKnots, numberOfKnots * samplingRateIncrease);
+% % smoothedY = spline(xCoordinates, yCoordinates, newXSamplePoints);
+% % Make the 2D array where the top row is the x coordinates and the bottom row is the y coordinates,
+% % but with the exception that the left column and right column is a vector that gives the direction of the slope.
+% yy = [0, xCoordinates', 0; 1, yCoordinates', 1]
+% pp = spline(1:numberOfKnots, yy); % Get interpolant
+% smoothedY = ppval(pp, newXSamplePoints); % Get smoothed y values in the "gaps".
+% % smoothedY is a 2D array with the x coordinates in the top row and the y coordinates in the bottom row.
+% smoothedXCoordinates = smoothedY(1, :)
+% smoothedYCoordinates = smoothedY(2, :)
+% % Plot smoothedY and show how the line is
+% % smooth, and has no sharp bends.
+% hold on; % Don't destroy the first curve we plotted.
+% hGreenCurve = plot(smoothedXCoordinates, smoothedYCoordinates, '-g');
+% title('Spline Interpolation Demo', 'FontSize', 20);
+% % But smoothedXCoordinates and smoothedYCoordinates are not in pixel coordinates, they have fractional values.
+% % If you want integer pixel values, you have to round.
+% intSmoothedXCoordinates = int32(smoothedXCoordinates)
+% intSmoothedYCoordinates = int32(smoothedYCoordinates)
+% % But now it's possible that some coordinates will be on the same pixel if that's
+% % how they rounded according to how they were located to the nearest integer pixel location.
+% % So use diff() to remove elements that have the same x and y values.
+% diffX = [1, diff(intSmoothedXCoordinates)];
+% diffY = [1, diff(intSmoothedYCoordinates)];
+% % Find out where both have zero difference from the prior point.
+% bothZero = (diffX==0) & (diffY == 0);
+% % Remove those from the arrays.
+% finalX = intSmoothedXCoordinates(~bothZero);
+% finalY = intSmoothedYCoordinates(~bothZero);
+% % Now remove the green line.
+% delete(hGreenCurve);
+% % Plot the final coordinates.
+% hGreenCurve = plot(finalX, finalY, '-y');
+% h = fill(finalX,finalY,'w');
+
+%%%%%
+
+img = imread('test.png');
+handles.axes = axes;
+imshow(img, 'Parent', handles.axes);
+axis(handles.axes, 'on');
+% yLimits = get(handles.axes,'YLim');   % If you have the handle already, ...
+% yTicks = yLimits(2)-get(handles.axes,'YTick');
+% set(handles.axes,'YTickLabel',num2str(yTicks.'));
+size(img);
+
+grayImage = rgb2gray(img);
+figure()
+imshow(grayImage)
+sz = size(grayImage);
+
+xg = 1:sz(1);
+yg = 1:sz(2);
+F = griddedInterpolant({xg,yg},double(grayImage),'nearest');
+
+xq = (0:1/10:sz(1))';
+yq = (0:1/10:sz(2))';
+vq = uint8(F({xq,yq}));
+vq = vq(1:end-1,1:end-1);
+figure()
+imshow(vq)
+
+vq = rescale(vq,1000,12500);
+
+% rescaled = rescale(grayImage,1000,12500);
+% rescaled_upsampled = upsample(rescaled,10);
+% rescaled_upsampled = rescaled_upsampled.';
+% rescaled_upsampled = upsample(rescaled_upsampled,10);
+% resample()
+
+% function pixelValues = savePixelValues(rgb)
+%     pixelValues = rgb2gray(rgb);
+% end

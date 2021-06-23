@@ -1,5 +1,5 @@
 Lattice units: 10^-2 um scaling
-Lattice parameters: single-diffusivity lattice (D=0.25 um^2/s)
+Lattice parameters: single-diffusivity (D=0.25 um^2/s)
 Number of walks: 10
 Time points (each particle): 5000
 Random start locations: no
@@ -13,7 +13,6 @@ histogram_10dt_dy: normalized histogram of displacements in the y-direction for 
 histogram_100dt_dy: normalized histogram of displacements in the y-direction for 100*delta-t
 
 msd_dt: squared displacement versus absolute time curves + MSD(dt) curve
-msd_dtau_log: squared displacement versus lag time curves + time-averaged MSD(dtau) curve plotted on a log-log graph
-msd_dtau_linear: squared displacement versus lag time curves + time-averaged MSD(dtau) curve plotted on a linear graph
+msd_dtau: squared displacement versus lag time curves + time-averaged MSD(dtau) curve plotted on a log-log graph
 
 Note: all histogram fits are Gaussian.

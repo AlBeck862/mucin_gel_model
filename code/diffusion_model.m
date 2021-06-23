@@ -10,12 +10,13 @@ global x all_cdf diffusivities
 save_lattice = 1; %0: don't save, 1: save (save the lattice to a .mat file if it is newly generated) --> used only if a lattice is generated
 lattice_x = 1e4; %size of the lattice along the horizontal axis (number of lattice columns)
 lattice_y = 1e4; %size of the lattice along the vertical axis (number of lattice rows)
-single_diffusivity_toggle = 0; %0: multiple subregions, 1: uniform lattice
-single_diffusivity = 7500; %value of the diffusivity when constructing a single-diffusivity lattice (units: 10^-4 um^2/s)
+single_diffusivity_toggle = 1; %0: multiple subregions, 1: uniform lattice
+single_diffusivity = 12500; %value of the diffusivity when constructing a single-diffusivity lattice (units: 10^-4 um^2/s)
+manual = 0; %0: automatic lattice generation, 1: import a manually-designed lattice
 
 % Simulation parameters
 time_pts = 5000; %total time points (absolute time, camera frame-rate)
-n = 25; %number of simulated particles.
+n = 10; %number of simulated particles.
 random_start = 1; %0: all particles start at the center of the lattice, 1: particles are each assigned a random start location, -1: all particles start at a hard-coded location
 visualize_lattice = 1; %0: no visualization, 1: visualization
 conversion_factor = 0.1; %conversion factor, units of seconds per time point
@@ -36,15 +37,13 @@ try
     load('lattice_data.mat','x','all_cdf','diffusivities')
     disp('Lattice and associated data loaded from file.')
 catch
-    disp('No pre-existing lattice is available. Generating a new lattice.')
     tic %begin benchmarking (lattice generation)
-    [lattice,x,all_cdf,diffusivities] = gen_lattice(save_lattice,lattice_x,lattice_y,conversion_factor,single_diffusivity_toggle,single_diffusivity);
+    [lattice,x,all_cdf,diffusivities] = gen_lattice(save_lattice,lattice_x,lattice_y,conversion_factor,single_diffusivity_toggle,single_diffusivity,manual);
     toc %end benchmarking (lattice generation)
-    disp('Lattice generated successfully.')
 end
 
 %%% LATTICE VISUALIZATION %%%
-lattice_visualization(visualize_lattice,lattice)
+% lattice_visualization(visualize_lattice,lattice)
 
 %%% WALK SIMULATION %%%
 [data_matrix,boundary_collision] = walk_simulation(n,time_pts,random_start,lattice,save_data);
