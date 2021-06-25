@@ -6,10 +6,13 @@ function [lattice,x,all_cdf,diffusivities] = gen_lattice(save_lattice,lattice_si
 % tau -- conversion factor: time points to seconds (unit of [seconds per time point])
 % single_diffusivity -- 0: multiple subregions (heterogeneous), 1: uniform lattice (homogeneous)
 
-%%% PARAMETERS %%%
+%%% DIFFUSIVITY PARAMETERS %%%
 % Set diffusivity values for each region (estimated via Wagner et al. Biomacromolecules article)
 min_diffusivity = 0.1; %um^2/s
 max_diffusivity = 1.25; %um^2/s
+
+%%% OTHER PARAMETERS %%%
+invert_grayscale = 1; %0: do not invert the grayscale image, 1: invert the grayscale image
 
 % Adjust the units of the diffusivities
 multiplier = 10000;
@@ -62,23 +65,32 @@ else
 
 %     gray_image = rgb2gray(lattice_img);
 	gray_image = im2gray(lattice_img);
-
     
 %     figure()
 %     imshow(grayImage)
     
     original_sz = size(gray_image);
-
+    expansion_factor_x = lattice_size_x/original_sz(1);
+    expansion_factor_y = lattice_size_y/original_sz(2);
+    
     xg = 1:original_sz(1);
     yg = 1:original_sz(2);
     F = griddedInterpolant({xg,yg},double(gray_image),'nearest');
 
-    xq = (0:1/10:original_sz(1))';
-    yq = (0:1/10:original_sz(2))';
+    xq = (0:1/expansion_factor_x:original_sz(1))';
+    yq = (0:1/expansion_factor_y:original_sz(2))';
     vq = uint8(F({xq,yq}));
     lattice = vq(1:end-1,1:end-1);
     
     final_sz = size(lattice);
+    
+    if invert_grayscale == 1
+        lattice = imcomplement(lattice);
+    end
+    
+    lattice = single(lattice);
+%     lattice = round(lattice,-1); %round to the nearest multiple of 10
+    lattice = round(lattice/5)*5; %round the the nearest multiple of 5
     
 %     figure()
 %     imshow(vq)

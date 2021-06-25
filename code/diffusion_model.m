@@ -10,9 +10,9 @@ global x all_cdf diffusivities
 save_lattice = 1; %0: don't save, 1: save (save the lattice to a .mat file if it is newly generated) --> used only if a lattice is generated
 lattice_x = 1e4; %size of the lattice along the horizontal axis (number of lattice columns)
 lattice_y = 1e4; %size of the lattice along the vertical axis (number of lattice rows)
-single_diffusivity_toggle = 1; %0: multiple subregions, 1: uniform lattice
+single_diffusivity_toggle = 0; %0: multiple subregions, 1: uniform lattice (note: setting "manual" to "1" bypasses this setting)
 single_diffusivity = 12500; %value of the diffusivity when constructing a single-diffusivity lattice (units: 10^-4 um^2/s)
-manual = 0; %0: automatic lattice generation, 1: import a manually-designed lattice
+manual = 1; %0: automatic lattice generation, 1: import a manually-designed lattice
 
 % Simulation parameters
 time_pts = 5000; %total time points (absolute time, camera frame-rate)
@@ -43,8 +43,8 @@ catch
 end
 
 %%% LATTICE VISUALIZATION %%%
-% lattice_visualization(visualize_lattice,lattice)
-
+lattice_visualization(visualize_lattice,lattice)
+blah
 %%% WALK SIMULATION %%%
 [data_matrix,boundary_collision] = walk_simulation(n,time_pts,random_start,lattice,save_data);
 

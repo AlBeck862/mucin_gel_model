@@ -12,9 +12,6 @@ g_a=guess_a;
 options=optimset('TolX',10^(-15),'TolFun',10^(-15),'MaxIter',100000,'MaxFunEvals',100000,'Display','off');
 [vars] = fminsearch(@msd_dtau_fxn,[g_D,g_a],options,lagT,msd);
 
-% vars(1)
-% vars(2)
-
 % D=exp(-abs(vars(1)));
 % a=exp(-abs(vars(2)));
 

@@ -80,7 +80,7 @@ end
 
 % Plot the corresponding time-averaged MSD(delta-tau) curve
 msd_tau_plotting = 10^-4.*(msd_tau_plotting/conversion_factor);
-plot(rescaled_time(1:length(msd_tau_plotting)),msd_tau_plotting,'LineWidth',2,'Color','red')
+plot(rescaled_time(1:length(msd_tau_plotting)),msd_tau_plotting,'LineWidth',3,'Color','red')
 
 % Plot title and axis labels
 title('Time-Averaged Squared Displacement vs. Lag Time')
@@ -97,6 +97,7 @@ end
 [Dfit, alphafit] = msd_dtau_fitting(0.01,1,delta_taus,msd_tau_plotting);
 diffusivity_disp_str = strcat(['Diffusion constant from the line of best fit: ' num2str(Dfit)]);
 alpha_disp_str = strcat(['Alpha from the line of best fit: ' num2str(alphafit)]);
+plot((delta_taus*conversion_factor),4.*Dfit.*delta_taus.^alphafit,'Linewidth',3,'Color','b','LineStyle',':')
 disp(diffusivity_disp_str)
 disp(alpha_disp_str)
 
@@ -110,6 +111,7 @@ for i = 1:length(segments)
         [Dfit, alphafit] = msd_dtau_fitting(0.01,1,delta_taus(find(rescaled_time==segments(i)):find(rescaled_time==segments(i+1))),msd_tau_plotting(find(rescaled_time==segments(i)):find(rescaled_time==segments(i+1))));
         diffusivity_disp_str = strcat(['Diffusion constant from the line of best fit (' num2str(segments(i)) 's - ' num2str(segments(i+1)) 's' '): ' num2str(Dfit)]);
         alpha_disp_str = strcat(['Alpha from the line of best fit: (' num2str(segments(i)) 's - ' num2str(segments(i+1)) 's' '): ' num2str(alphafit)]);
+        plot((delta_taus(find(rescaled_time==segments(i)):find(rescaled_time==segments(i+1)))*conversion_factor),4.*Dfit.*delta_taus(find(rescaled_time==segments(i)):find(rescaled_time==segments(i+1))).^alphafit,'Linewidth',3,'Color','k','LineStyle','--')
     catch %used for the final segment (from the final segment value in "segments" to the end of the lag time range)
         if length(log_times)-(segments(end)/conversion_factor) < 10 %ignore this final segment if there are too few data points for it to be representative of a trend (the minimum is hard-coded to ten data points)
             disp('NOTE. The final bracket is too small to attempt a slope and intercept estimate.')
@@ -118,6 +120,7 @@ for i = 1:length(segments)
             [Dfit, alphafit] = msd_dtau_fitting(0.01,1,delta_taus(find(rescaled_time==segments(i)):end),msd_tau_plotting(find(rescaled_time==segments(i)):end));
             diffusivity_disp_str = strcat(['Diffusion constant from the line of best fit (' num2str(segments(i)) 's - end): ' num2str(Dfit)]);
             alpha_disp_str = strcat(['Alpha from the line of best fit: (' num2str(segments(i)) 's - end): ' num2str(alphafit)]);
+            plot((delta_taus(find(rescaled_time==segments(i)):end)*conversion_factor),4.*Dfit.*delta_taus(find(rescaled_time==segments(i)):end).^alphafit,'Linewidth',3,'Color','k','LineStyle','--')
         end
     end
     
