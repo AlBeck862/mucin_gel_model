@@ -41,7 +41,7 @@ for j = 1:size(multiples_delta_time,2)
         
     end
     
-    if save_data == 1
+    if save_data == true
         save_name_str = strcat(['histograms_all_displacements_' num2str(multiples_delta_time(j)) 'dt.mat']);
         save(save_name_str,'all_displacement_storage_x','all_displacement_storage_y')
     end

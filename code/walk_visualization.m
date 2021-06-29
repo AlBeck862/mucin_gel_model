@@ -24,9 +24,9 @@ for i = 1:n
     current_particle_y = data_matrix(i,:,2);
     current_particle_y(current_particle_y==0) = [];
     
-    plot(current_particle_x,current_particle_y) %plot the entire trajectory
-    plot(current_particle_x(1),current_particle_y(1),'>g','MarkerFaceColor','g','MarkerSize',10) %mark the start point
-    plot(current_particle_x(end),current_particle_y(end),'sr','MarkerFaceColor','r','MarkerSize',10) %mark the end point
+    plot(current_particle_x,current_particle_y)                                                         %plot the entire trajectory
+    plot(current_particle_x(1),current_particle_y(1),'>g','MarkerFaceColor','g','MarkerSize',10)        %mark the start point
+    plot(current_particle_x(end),current_particle_y(end),'sr','MarkerFaceColor','r','MarkerSize',10)    %mark the end point
     legend('Particle Trajectory','Start','End')
     title_str = strcat(['Particle Trajectory (Particle #' num2str(i) ')']);
     title(title_str)

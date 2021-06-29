@@ -27,9 +27,9 @@ for i = 1:n
         current_particle_diffs(j) = lattice(current_particle_x(j),current_particle_y(j));
     end
     
-    current_particle_diffs = current_particle_diffs(1:end-1); %match current_particle_diffs with stepsize_x and stepsize_y (the final diffusivity does not matter)
-	[unique_diffs,~,idx_c] = unique(current_particle_diffs); %determine the unique diffusivities encountered
-    tally = accumarray(idx_c,1); %count the number of times each unique diffusivity occurs
+    current_particle_diffs = current_particle_diffs(1:end-1);   %match current_particle_diffs with stepsize_x and stepsize_y (the final diffusivity does not matter)
+	[unique_diffs,~,idx_c] = unique(current_particle_diffs);    %determine the unique diffusivities encountered
+    tally = accumarray(idx_c,1);                                %count the number of times each unique diffusivity occurs
     tally = tally';
     
     % Bar plot of the diffusivities encountered by the current particle
@@ -51,7 +51,7 @@ for i = 1:n
     
     % Plot of the x-direction step-sizes of the current particle (corresponding diffusivities are overlaid)
     figure()
-    plot(movmean(stepsizes_x,moving_avg_kernel))
+    plot(movmean(stepsizes_x,moving_avg_kernel)) %plot using a moving average to smooth out the curve
     x_dir_title_str = strcat(['Step-Size (x-direction) and Diffusivity vs. Absolute Time (Particle #' num2str(i) ')']);
     title(x_dir_title_str)
     xlabel('Absolute Time [time points]')
@@ -59,7 +59,7 @@ for i = 1:n
     
     yyaxis right
     plot(current_particle_diffs)
-%     plot(movmean(current_particle_diffs,moving_avg_kernel))
+%     plot(movmean(current_particle_diffs,moving_avg_kernel)) %plot using a moving average to smooth out the curve
     ylabel('Diffusivity [(10^{-4}\mum)^2/s]')
     
 	file_str = strcat(['/temp_results/step_sizes/stepsizes_dx_particle' num2str(i) '.jpeg']);
@@ -67,7 +67,7 @@ for i = 1:n
     
     % Plot of the y-direction step-sizes of the current particle (corresponding diffusivities are overlaid)
     figure()
-    plot(movmean(stepsizes_y,moving_avg_kernel))
+    plot(movmean(stepsizes_y,moving_avg_kernel)) %plot using a moving average to smooth out the curve
     y_dir_title_str = strcat(['Step-Size (y-direction) and Diffusivity vs. Absolute Time (Particle #' num2str(i) ')']);
     title(y_dir_title_str)
     xlabel('Absolute Time [time points]')
@@ -75,7 +75,7 @@ for i = 1:n
     
 	yyaxis right
     plot(current_particle_diffs)
-%     plot(movmean(current_particle_diffs,moving_avg_kernel))
+%     plot(movmean(current_particle_diffs,moving_avg_kernel)) %plot using a moving average to smooth out the curve
     ylabel('Diffusivity [(10^{-4}\mum)^2/s]')
     
 	file_str = strcat(['/temp_results/step_sizes/stepsizes_dy_particle' num2str(i) '.jpeg']);

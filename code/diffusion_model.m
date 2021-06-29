@@ -1,33 +1,34 @@
 tic %begin benchmarking (entire script)
 
-% Diffusion model
-% IMPORTANT NOTE: the x-axis and y-axis are reversed due to MATLAB's row-column data storage convention
-
 global x all_cdf diffusivities
 
 %%% PARAMETERS %%%
 % Lattice generation parameters
-save_lattice = 1; %0: don't save, 1: save (save the lattice to a .mat file if it is newly generated) --> used only if a lattice is generated
-lattice_x = 1e4; %size of the lattice along the horizontal axis (number of lattice columns)
-lattice_y = 1e4; %size of the lattice along the vertical axis (number of lattice rows)
-single_diffusivity_toggle = 0; %0: multiple subregions, 1: uniform lattice (note: setting "manual" to "1" bypasses this setting)
-single_diffusivity = 12500; %value of the diffusivity when constructing a single-diffusivity lattice (units: 10^-4 um^2/s)
-import_lattice = 1; %0: automatic lattice generation, 1: import a manually-designed lattice
+% Note: the origin (i.e. (0,0)) of all images is in the top left corner due to MATLAB's data storage convention
+lattice_x = 1e4;                            %size of the lattice along the horizontal axis (number of lattice columns)
+lattice_y = 1e4;                            %size of the lattice along the vertical axis (number of lattice rows)
+save_lattice = true;                        %false: don't save, true: save (save the lattice to a .mat file if it is newly generated)
+single_diffusivity_toggle = false;          %false: multiple subregions, true: uniform lattice (note: setting "import_lattice" to "true" bypasses this setting)
+single_diffusivity = 12500;                 %value of the diffusivity when constructing a single-diffusivity lattice (units: 10^-4 um^2/s)
+import_lattice = true;                      %false: automatic lattice generation, true: import a manually-designed lattice
+invert_grayscale = false;                   %false: do not invert the grayscale image, true: invert the grayscale image
+round_imported_lattice = true;              %false: do not modify the grayscale image's pixel values, true: round the grayscale image's pixel values to the nearest multiple of "round_imported_lattice_multiple"
+round_imported_lattice_multiple = 5;        %round the grayscale image's pixel values to the nearest multiple of this value
 
 % Simulation parameters
-time_pts = 5000; %total time points (absolute time, camera frame-rate)
-n = 5; %number of simulated particles.
-random_start = 1; %0: all particles start at the center of the lattice, 1: particles are each assigned a random start location, -1: all particles start at a hard-coded location
-visualize_lattice = 1; %0: no visualization, 1: visualization
-conversion_factor = 0.1; %conversion factor, units of seconds per time point
+time_pts = 5000;                            %total time points (absolute time, camera frame-rate)
+n = 1;                                      %number of simulated particles.
+start_type = 'other_fixed';                 %'center': all particles start at the center of the lattice, 'random': particles are each assigned a random start location, 'other_fixed': all particles start at a hard-coded location
+visualize_lattice = true;                   %false: no visualization, true: visualization
+conversion_factor = 0.1;                    %conversion factor, units of seconds per time point
 
 % Plotting parameters
-multiples_delta_time = [1,10,100]; %additional time point intervals for displacement histogram generation (each value corresponds to a set of two histograms (x-direction and y-direction)
-msd_dtau_log = 1; %0: MSD(delta-tau) plots will be linearly scaled, 1: MSD(delta-tau) plots will be logarithmically scaled (this does not affect the line-of-best-fit parameters)
-moving_avg_kernel = round(time_pts/100); %size of the window over which to average the displacement data when plotting step-size over time
+multiples_delta_time = [1,10,100];          %additional time point intervals for displacement histogram generation (each value corresponds to a set of two histograms (x-direction and y-direction)
+msd_dtau_log = true;                        %false: MSD(delta-tau) plots will be linearly scaled, true: MSD(delta-tau) plots will be logarithmically scaled (this does not affect the line-of-best-fit parameters)
+moving_avg_kernel = round(time_pts/100);    %size of the window over which to average the displacement data when plotting step-size over time
 
 % Other parameters
-save_data = 0; %0: no data variables are saved, 1: certain data variables are saved (data_matrix, boundary_collision, all_displacement_storage_x, all_displacement_storage_y)
+save_data = false;                          %false: no data variables are saved, true: certain data variables are saved (data_matrix, boundary_collision, all_displacement_storage_x, all_displacement_storage_y)
 
 %%% SET-UP %%%
 % Fetch a lattice
@@ -38,7 +39,7 @@ try
     disp('Lattice and associated data loaded from file.')
 catch
     tic %begin benchmarking (lattice generation)
-    [lattice,x,all_cdf,diffusivities] = gen_lattice(save_lattice,lattice_x,lattice_y,conversion_factor,single_diffusivity_toggle,single_diffusivity,import_lattice);
+    [lattice,x,all_cdf,diffusivities] = gen_lattice(save_lattice,lattice_x,lattice_y,conversion_factor,single_diffusivity_toggle,single_diffusivity,import_lattice, invert_grayscale, round_imported_lattice, round_imported_lattice_multiple);
     toc %end benchmarking (lattice generation)
 end
 
@@ -46,7 +47,7 @@ end
 lattice_visualization(visualize_lattice,lattice)
 
 %%% WALK SIMULATION %%%
-[data_matrix,boundary_collision] = walk_simulation(n,time_pts,random_start,lattice,save_data);
+[data_matrix,boundary_collision] = walk_simulation(n,time_pts,start_type,lattice,save_data);
 
 %%% WALK VISUALIZATION %%%
 walk_visualization(n,lattice,data_matrix)

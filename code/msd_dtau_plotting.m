@@ -3,10 +3,10 @@ function msd_dtau_plotting(n,time_pts,data_matrix,boundary_collision,conversion_
 % particle as well as the ensemble-averaged MSD(delta-tau) curve.
 
 %%% PLOT SET-UP %%%
-time_fraction = 1/3; %fraction of the total number of time points over which to generate the curve
-delta_taus = 1:round(time_pts*time_fraction); %time point intervals for displacement measurements
-sqd_dispmnts_lag_time = zeros(n,time_pts,size(delta_taus,2)); %storage for displacements at each time point interval
-rescaled_time = 0.1:0.1:time_pts*conversion_factor; %time in seconds used for more realistic plotting
+time_fraction = 1/3;                                            %fraction of the total number of time points over which to generate the curve
+delta_taus = 1:round(time_pts*time_fraction);                   %time point intervals for displacement measurements
+sqd_dispmnts_lag_time = zeros(n,time_pts,size(delta_taus,2));   %storage for displacements at each time point interval
+rescaled_time = 0.1:0.1:time_pts*conversion_factor;             %time in seconds used for more realistic plotting
 legend_array = {};
 
 % Compute the displacements for the given delta-tau values (multiples of delta-t)
@@ -43,10 +43,10 @@ end
 sdlt_plotting = zeros(n,size(delta_taus,2));
 for i = 1:n
     for j = 1:size(delta_taus,2)
-        current_particle_tau = sqd_dispmnts_lag_time(i,:,j); %isolate one particle
-        start_of_trailing_zeros = find(sqd_dispmnts_lag_time(i,:,j),1,'last') + 1; %find the index of the two consecutive zeros in sqd_dispmnts_lag_time for the given multiple of delta-t
-        current_particle_tau(start_of_trailing_zeros:end) = []; %remove all trailing zeros from the data matrix
-        sdlt_plotting(i,j) = mean(current_particle_tau); %compute the mean for the given particle at the given time lag
+        current_particle_tau = sqd_dispmnts_lag_time(i,:,j);                        %isolate one particle
+        start_of_trailing_zeros = find(sqd_dispmnts_lag_time(i,:,j),1,'last') + 1;  %find the index of the two consecutive zeros in sqd_dispmnts_lag_time for the given multiple of delta-t
+        current_particle_tau(start_of_trailing_zeros:end) = [];                     %remove all trailing zeros from the data matrix
+        sdlt_plotting(i,j) = mean(current_particle_tau);                            %compute the mean for the given particle at the given time lag
     end
 end
 
@@ -57,7 +57,7 @@ for i = 1:n
     sdlt_plotting_particle = sdlt_plotting(i,:);
     sdlt_plotting_particle = no_trailing_zeros(sdlt_plotting_particle); %remove trailing (excess) zeros if a given walk ended early
     sdlt_plotting_particle = 10^-4.*(sdlt_plotting_particle/conversion_factor);
-    plot(rescaled_time(1:length(sdlt_plotting_particle)),sdlt_plotting_particle);
+    plot(rescaled_time(1:length(sdlt_plotting_particle)),sdlt_plotting_particle,'Color',[0,0,0]);
     legend_array{end+1} = '';
     hold on
     
@@ -91,7 +91,7 @@ xlabel('Lag Time \Delta\tau [s]')
 ylabel('Time-Averaged MSD(\Delta\tau) [\mum^2]')
 
 % Scale the axes logarithmically if requested
-if msd_dtau_log == 1
+if msd_dtau_log == true
     set(gca,'XScale','log');
     set(gca,'YScale','log');
 end
