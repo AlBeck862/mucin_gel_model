@@ -66,6 +66,9 @@ for j = 1:size(multiples_delta_time,2)
 	fit_legend_x = strcat(['Mean = ' num2str(fit_data_x.mu) ', Std. Dev. = ' num2str(fit_data_x.sigma)]);
     legend('Distribution',fit_legend_x)
     
+	file_str = strcat(['/temp_results/histograms/histogram_' num2str(multiples_delta_time(j)) 'dt_dx.jpeg']);
+    saveas(gcf,[pwd file_str]);
+    
 	% y-direction displacements histogram
     figure()
     hist_obj_y = histogram(all_displacement_storage_y, 'Normalization', 'pdf');
@@ -83,6 +86,9 @@ for j = 1:size(multiples_delta_time,2)
 	fit_legend_y = strcat(['Mean = ' num2str(fit_data_y.mu) ', Std. Dev. = ' num2str(fit_data_y.sigma)]);
     legend('Distribution',fit_legend_y)
 
+	file_str = strcat(['/temp_results/histograms/histogram_' num2str(multiples_delta_time(j)) 'dt_dy.jpeg']);
+    saveas(gcf,[pwd file_str]);
+    
     % Stacked displacements histogram
 % 	figure()
 %     hist_obj = histogram(all_displacement_storage_both, 'Normalization', 'pdf');

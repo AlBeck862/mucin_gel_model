@@ -1,4 +1,4 @@
-function [lattice,x,all_cdf,diffusivities] = gen_lattice(save_lattice,lattice_size_x,lattice_size_y,tau,single_diffusivity_toggle,single_diffusivity,manual)
+function [lattice,x,all_cdf,diffusivities] = gen_lattice(save_lattice,lattice_size_x,lattice_size_y,tau,single_diffusivity_toggle,single_diffusivity,import_lattice)
 % GEN_LATTICE Generate a lattice environment for diffusion.
 % save_lattice -- 0: don't save, 1: save (save the lattice to a .mat file)
 % lattice_size_x -- size of the lattice along the x-axis (width)
@@ -21,7 +21,7 @@ max_diffusivity = multiplier*max_diffusivity; %10^-4 um^2/s
 
 %%% LATTICE IMPORT OR GENERATION %%%
 % Manually-designed lattice import or automatic lattice generation
-if manual == 0
+if import_lattice == 0
 	disp('No pre-existing lattice is available. Generating a new lattice.')
     
     % Define the lattice (homogeneous or heterogeneous)
@@ -65,6 +65,11 @@ else
 
 %     gray_image = rgb2gray(lattice_img);
 	gray_image = im2gray(lattice_img);
+    
+%     figure()
+%     imshow(gray_image)
+    
+    gray_image = fliplr(rot90(gray_image,-1));
     
 %     figure()
 %     imshow(grayImage)

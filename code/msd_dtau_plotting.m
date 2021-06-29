@@ -7,6 +7,7 @@ time_fraction = 1/3; %fraction of the total number of time points over which to 
 delta_taus = 1:round(time_pts*time_fraction); %time point intervals for displacement measurements
 sqd_dispmnts_lag_time = zeros(n,time_pts,size(delta_taus,2)); %storage for displacements at each time point interval
 rescaled_time = 0.1:0.1:time_pts*conversion_factor; %time in seconds used for more realistic plotting
+legend_array = {};
 
 % Compute the displacements for the given delta-tau values (multiples of delta-t)
 counter_msd_tau = 1;
@@ -56,7 +57,8 @@ for i = 1:n
     sdlt_plotting_particle = sdlt_plotting(i,:);
     sdlt_plotting_particle = no_trailing_zeros(sdlt_plotting_particle); %remove trailing (excess) zeros if a given walk ended early
     sdlt_plotting_particle = 10^-4.*(sdlt_plotting_particle/conversion_factor);
-    plot(rescaled_time(1:length(sdlt_plotting_particle)),sdlt_plotting_particle)
+    plot(rescaled_time(1:length(sdlt_plotting_particle)),sdlt_plotting_particle);
+    legend_array{end+1} = '';
     hold on
     
     % Line of best fit for each individual particle's curve
@@ -81,6 +83,7 @@ end
 % Plot the corresponding time-averaged MSD(delta-tau) curve
 msd_tau_plotting = 10^-4.*(msd_tau_plotting/conversion_factor);
 plot(rescaled_time(1:length(msd_tau_plotting)),msd_tau_plotting,'LineWidth',3,'Color','red')
+legend_array{end+1} = 'Time-Averaged MSD(\Delta\tau)';
 
 % Plot title and axis labels
 title('Time-Averaged Squared Displacement vs. Lag Time')
@@ -98,6 +101,7 @@ end
 diffusivity_disp_str = strcat(['Diffusion constant from the line of best fit: ' num2str(Dfit)]);
 alpha_disp_str = strcat(['Alpha from the line of best fit: ' num2str(alphafit)]);
 plot((delta_taus*conversion_factor),4.*Dfit.*delta_taus.^alphafit,'Linewidth',3,'Color','b','LineStyle',':')
+legend_array{end+1} = 'Overall Line of Best Fit';
 disp(diffusivity_disp_str)
 disp(alpha_disp_str)
 
@@ -112,6 +116,8 @@ for i = 1:length(segments)
         diffusivity_disp_str = strcat(['Diffusion constant from the line of best fit (' num2str(segments(i)) 's - ' num2str(segments(i+1)) 's' '): ' num2str(Dfit)]);
         alpha_disp_str = strcat(['Alpha from the line of best fit: (' num2str(segments(i)) 's - ' num2str(segments(i+1)) 's' '): ' num2str(alphafit)]);
         plot((delta_taus(find(rescaled_time==segments(i)):find(rescaled_time==segments(i+1)))*conversion_factor),4.*Dfit.*delta_taus(find(rescaled_time==segments(i)):find(rescaled_time==segments(i+1))).^alphafit,'Linewidth',3,'Color','k','LineStyle','--')
+        legend_str = strcat(['Line of Best Fit: ' num2str(segments(i)) 's - ' num2str(segments(i+1)) 's']);
+        legend_array{end+1} = legend_str;
     catch %used for the final segment (from the final segment value in "segments" to the end of the lag time range)
         if length(log_times)-(segments(end)/conversion_factor) < 10 %ignore this final segment if there are too few data points for it to be representative of a trend (the minimum is hard-coded to ten data points)
             disp('NOTE. The final bracket is too small to attempt a slope and intercept estimate.')
@@ -121,6 +127,8 @@ for i = 1:length(segments)
             diffusivity_disp_str = strcat(['Diffusion constant from the line of best fit (' num2str(segments(i)) 's - end): ' num2str(Dfit)]);
             alpha_disp_str = strcat(['Alpha from the line of best fit: (' num2str(segments(i)) 's - end): ' num2str(alphafit)]);
             plot((delta_taus(find(rescaled_time==segments(i)):end)*conversion_factor),4.*Dfit.*delta_taus(find(rescaled_time==segments(i)):end).^alphafit,'Linewidth',3,'Color','k','LineStyle','--')
+            legend_str = strcat(['Line of Best Fit: ' num2str(segments(i)) 's - end']);
+            legend_array{end+1} = legend_str;
         end
     end
     
@@ -128,5 +136,9 @@ for i = 1:length(segments)
     disp(alpha_disp_str)
     
 end
+
+legend(legend_array,'Location','southeast')
+
+saveas(gcf,[pwd '/temp_results/msd_dtau.jpeg']);
 
 end

@@ -43,4 +43,6 @@ title('Squared Displacement vs. Absolute Time')
 xlabel('Absolute Time \Deltat [simulation time points]')
 ylabel('MSD(\Deltat) [(10^{-2}\mum)^2]')
 
+saveas(gcf,[pwd '/temp_results/msd_dt.jpeg']);
+
 end

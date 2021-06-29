@@ -46,6 +46,9 @@ for i = 1:n
     ylabel('Frequency')
     grid on
     
+	file_str = strcat(['/temp_results/diffusivities/diffusivities_particle' num2str(i) '.jpeg']);
+    saveas(gcf,[pwd file_str]);
+    
     % Plot of the x-direction step-sizes of the current particle (corresponding diffusivities are overlaid)
     figure()
     plot(movmean(stepsizes_x,moving_avg_kernel))
@@ -59,6 +62,9 @@ for i = 1:n
 %     plot(movmean(current_particle_diffs,moving_avg_kernel))
     ylabel('Diffusivity [(10^{-4}\mum)^2/s]')
     
+	file_str = strcat(['/temp_results/step_sizes/stepsizes_dx_particle' num2str(i) '.jpeg']);
+    saveas(gcf,[pwd file_str]);
+    
     % Plot of the y-direction step-sizes of the current particle (corresponding diffusivities are overlaid)
     figure()
     plot(movmean(stepsizes_y,moving_avg_kernel))
@@ -71,6 +77,9 @@ for i = 1:n
     plot(current_particle_diffs)
 %     plot(movmean(current_particle_diffs,moving_avg_kernel))
     ylabel('Diffusivity [(10^{-4}\mum)^2/s]')
+    
+	file_str = strcat(['/temp_results/step_sizes/stepsizes_dy_particle' num2str(i) '.jpeg']);
+    saveas(gcf,[pwd file_str]);
     
 end
 

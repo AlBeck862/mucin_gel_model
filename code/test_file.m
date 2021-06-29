@@ -686,32 +686,32 @@
 
 %%%%%
 
-img = imread('test.png');
-handles.axes = axes;
-imshow(img, 'Parent', handles.axes);
-axis(handles.axes, 'on');
-% yLimits = get(handles.axes,'YLim');   % If you have the handle already, ...
-% yTicks = yLimits(2)-get(handles.axes,'YTick');
-% set(handles.axes,'YTickLabel',num2str(yTicks.'));
-size(img);
-
-grayImage = rgb2gray(img);
-figure()
-imshow(grayImage)
-sz = size(grayImage);
-
-xg = 1:sz(1);
-yg = 1:sz(2);
-F = griddedInterpolant({xg,yg},double(grayImage),'nearest');
-
-xq = (0:1/10:sz(1))';
-yq = (0:1/10:sz(2))';
-vq = uint8(F({xq,yq}));
-vq = vq(1:end-1,1:end-1);
-figure()
-imshow(vq)
-
-vq = rescale(vq,1000,12500);
+% img = imread('test.png');
+% handles.axes = axes;
+% imshow(img, 'Parent', handles.axes);
+% axis(handles.axes, 'on');
+% % yLimits = get(handles.axes,'YLim');   % If you have the handle already, ...
+% % yTicks = yLimits(2)-get(handles.axes,'YTick');
+% % set(handles.axes,'YTickLabel',num2str(yTicks.'));
+% size(img);
+% 
+% grayImage = rgb2gray(img);
+% figure()
+% imshow(grayImage)
+% sz = size(grayImage);
+% 
+% xg = 1:sz(1);
+% yg = 1:sz(2);
+% F = griddedInterpolant({xg,yg},double(grayImage),'nearest');
+% 
+% xq = (0:1/10:sz(1))';
+% yq = (0:1/10:sz(2))';
+% vq = uint8(F({xq,yq}));
+% vq = vq(1:end-1,1:end-1);
+% figure()
+% imshow(vq)
+% 
+% vq = rescale(vq,1000,12500);
 
 % rescaled = rescale(grayImage,1000,12500);
 % rescaled_upsampled = upsample(rescaled,10);
@@ -722,3 +722,5 @@ vq = rescale(vq,1000,12500);
 % function pixelValues = savePixelValues(rgb)
 %     pixelValues = rgb2gray(rgb);
 % end
+
+%%%%%

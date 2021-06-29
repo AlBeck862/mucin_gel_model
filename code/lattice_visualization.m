@@ -10,6 +10,8 @@ if visualize_lattice == 1
     
     lattice_visualization = fliplr(rot90(lattice_visualization,-1));
     imshow(lattice_visualization)
+    
+    saveas(gcf,[pwd '/temp_results/lattice/lattice.png']);
 end
 
 end

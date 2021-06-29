@@ -10,7 +10,7 @@ end
 lattice_visualization = fliplr(rot90(lattice_visualization,-1));
 
 for i = 1:n
-    pause(1)
+    pause(3)
     
     figure()
     imshow(lattice_visualization)
@@ -30,6 +30,9 @@ for i = 1:n
     legend('Particle Trajectory','Start','End')
     title_str = strcat(['Particle Trajectory (Particle #' num2str(i) ')']);
     title(title_str)
+    
+    file_str = strcat(['/temp_results/walks/walk_particle' num2str(i) '.png']);
+    saveas(gcf,[pwd file_str]);
     
     clearvars current_particle_x current_particle_y %clear variables for the next loop iteration
 end

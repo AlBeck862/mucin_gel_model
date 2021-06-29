@@ -20,8 +20,8 @@ if random_start == 1
     y_start = round(min_start_y + (max_start_y-min_start_y).*rand());
 elseif random_start == -1 %for testing purposes
     %  The particle will start at a specific, hard-coded location
-	x_start = 200;
-    y_start = 200;
+	x_start = round(lattice_x/2);
+    y_start = 9500;
 else
     % The particle will start at the center of the lattice
     x_start = round(lattice_x/2);
