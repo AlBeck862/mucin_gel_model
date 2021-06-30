@@ -1,7 +1,7 @@
-function [data_matrix,boundary_collision] = walk_simulation(n,time_pts,start_type,lattice,save_data)
+function [data_matrix,boundary_collision] = walk_simulation(n,time_pts,start_type,lattice,save_data,x,all_cdf,diffusivities)
 % WALK_SIMULATION Simulate the diffusion of n particles over a maximum of
 % time_pts time points.
-% random_start -- determines the initial location of the particle (see the main script for details)
+% start_type -- determines the initial location of the particle (see the main script for details)
 % lattice -- stores the diffusivity values used to define a particle's diffusion given its location at a given time point
 
 tic %begin benchmarking (particle simulation)
@@ -33,13 +33,14 @@ for i = 1:n %iterate through each particle
             break
         end
         
-        current_displacement_x = round(get_dispmnt_variation(current_diffusivity)); %randomly select a distance in the x-direction
-        current_displacement_y = round(get_dispmnt_variation(current_diffusivity)); %randomly select a distance in the y-direction
+%         tic
+        current_displacement_x = round(get_dispmnt_variation(current_diffusivity,x,all_cdf,diffusivities)); %randomly select a distance in the x-direction
+        current_displacement_y = round(get_dispmnt_variation(current_diffusivity,x,all_cdf,diffusivities)); %randomly select a distance in the y-direction
+%         toc
         
         % Update the particle's position
         data_matrix(i,j,1) = data_matrix(i,j-1,1) + current_displacement_x;
         data_matrix(i,j,2) = data_matrix(i,j-1,2) + current_displacement_y;
-
     end
 end
 

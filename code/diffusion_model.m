@@ -1,24 +1,22 @@
 tic %begin benchmarking (entire script)
 
-global x all_cdf diffusivities
-
 %%% PARAMETERS %%%
 % Lattice generation parameters
 % Note: the origin (i.e. (0,0)) of all images is in the top left corner due to MATLAB's data storage convention
 lattice_x = 1e4;                            %size of the lattice along the horizontal axis (number of lattice columns)
 lattice_y = 1e4;                            %size of the lattice along the vertical axis (number of lattice rows)
 save_lattice = true;                        %false: don't save, true: save (save the lattice to a .mat file if it is newly generated)
-single_diffusivity_toggle = false;          %false: multiple subregions, true: uniform lattice (note: setting "import_lattice" to "true" bypasses this setting)
-single_diffusivity = 12500;                 %value of the diffusivity when constructing a single-diffusivity lattice (units: 10^-4 um^2/s)
-import_lattice = true;                      %false: automatic lattice generation, true: import a manually-designed lattice
+single_diffusivity_toggle = true;          %false: multiple subregions, true: uniform lattice (note: setting "import_lattice" to "true" bypasses this setting)
+single_diffusivity = 2500;                 %value of the diffusivity when constructing a single-diffusivity lattice (units: 10^-4 um^2/s)
+import_lattice = false;                      %false: automatic lattice generation, true: import a manually-designed lattice
 invert_grayscale = false;                   %false: do not invert the grayscale image, true: invert the grayscale image
 round_imported_lattice = true;              %false: do not modify the grayscale image's pixel values, true: round the grayscale image's pixel values to the nearest multiple of "round_imported_lattice_multiple"
 round_imported_lattice_multiple = 5;        %round the grayscale image's pixel values to the nearest multiple of this value
 
 % Simulation parameters
 time_pts = 5000;                            %total time points (absolute time, camera frame-rate)
-n = 1;                                      %number of simulated particles.
-start_type = 'other_fixed';                 %'center': all particles start at the center of the lattice, 'random': particles are each assigned a random start location, 'other_fixed': all particles start at a hard-coded location
+n = 5;                                      %number of simulated particles.
+start_type = 'random';                      %'center': all particles start at the center of the lattice, 'random': particles are each assigned a random start location, 'other_fixed': all particles start at a hard-coded location
 visualize_lattice = true;                   %false: no visualization, true: visualization
 conversion_factor = 0.1;                    %conversion factor, units of seconds per time point
 
@@ -47,7 +45,7 @@ end
 lattice_visualization(visualize_lattice,lattice)
 
 %%% WALK SIMULATION %%%
-[data_matrix,boundary_collision] = walk_simulation(n,time_pts,start_type,lattice,save_data);
+[data_matrix,boundary_collision] = walk_simulation(n,time_pts,start_type,lattice,save_data,x,all_cdf,diffusivities);
 
 %%% WALK VISUALIZATION %%%
 walk_visualization(n,lattice,data_matrix)

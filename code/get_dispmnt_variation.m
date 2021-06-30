@@ -1,12 +1,23 @@
-function dispVar = get_dispmnt_variation(diffusivity)
+function dispVar = get_dispmnt_variation(diffusivity,x,all_cdf,diffusivities)
 % GET_DISPMNT_VARIATION Return the additional displacement to be undergone
 % by a simulated particle given a diffusivity (D) and a time lag (tau).
 
-global x all_cdf diffusivities
-
 % Fetch the appropriate CDF for the given diffusivity
-cdf = all_cdf(diffusivities==diffusivity,:);
-cdf = round(cdf,5);
+
+% tic
+persistent cdf previous_diff
+
+if isempty(cdf) || diffusivity ~= previous_diff
+    cdf = all_cdf(diffusivities==diffusivity,:);
+    cdf = round(cdf,5);
+    previous_diff = diffusivity;
+end
+% toc
+
+% tic
+% cdf = all_cdf(diffusivities==diffusivity,:);
+% cdf = round(cdf,5);
+% toc
 
 is_valid_x = 0; %used to fetch a new x value if none was found in the rounded CDF
 while is_valid_x == 0

@@ -724,3 +724,21 @@
 % end
 
 %%%%%
+
+x = 1;
+
+tic
+if x
+    disp(x)
+else
+    3
+end
+toc
+
+tic
+try
+    x
+catch
+    3
+end
+toc
