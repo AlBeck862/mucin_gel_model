@@ -1,4 +1,4 @@
-function [lattice,x,all_cdf,diffusivities] = gen_lattice(save_lattice,lattice_size_x,lattice_size_y,tau,single_diffusivity_toggle,single_diffusivity,import_lattice, invert_grayscale, round_imported_lattice, round_imported_lattice_multiple)
+function [lattice,x,all_cdf,diffusivities] = gen_lattice(save_lattice,lattice_size_x,lattice_size_y,tau,single_diffusivity_toggle,single_diffusivity,import_lattice, invert_grayscale, round_imported_lattice, round_imported_lattice_multiple, multiplier)
 % GEN_LATTICE Generate a lattice environment for diffusion.
 % save_lattice -- 0: don't save, 1: save (save the lattice to a .mat file)
 % lattice_size_x -- size of the lattice along the x-axis (width)
@@ -7,14 +7,16 @@ function [lattice,x,all_cdf,diffusivities] = gen_lattice(save_lattice,lattice_si
 % single_diffusivity -- 0: multiple subregions (heterogeneous), 1: uniform lattice (homogeneous)
 
 %%% DIFFUSIVITY PARAMETERS %%%
-% Set diffusivity values for each region (estimated via the Wagner et al. Biomacromolecules article)
-min_diffusivity = 0.1;  %units: um^2/s
-max_diffusivity = 1.25; %units: um^2/s
+% % min_diffusivity = 0.1;  %units: um^2/s
+% % max_diffusivity = 1.25; %units: um^2/s
+min_diffusivity = 0.409;  %units: um^2/s
+max_diffusivity = 40.9; %units: um^2/s
 
 % Adjust the units of the diffusivities
-multiplier = 10000;
-min_diffusivity = multiplier*min_diffusivity; %units: 10^-4 um^2/s
-max_diffusivity = multiplier*max_diffusivity; %units: 10^-4 um^2/s
+% min_diffusivity = multiplier*min_diffusivity; %units: 10^-4 um^2/s
+% max_diffusivity = multiplier*max_diffusivity; %units: 10^-4 um^2/s
+min_diffusivity = multiplier*min_diffusivity; %units: 10^-2 um^2/s
+max_diffusivity = multiplier*max_diffusivity; %units: 10^-2 um^2/s
 
 %%% LATTICE IMPORT OR GENERATION %%%
 if import_lattice == false %automatic lattice generation

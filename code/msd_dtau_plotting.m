@@ -1,12 +1,12 @@
-function msd_dtau_plotting(n,time_pts,data_matrix,boundary_collision,conversion_factor,msd_dtau_log)
+function msd_dtau_plotting(n,time_pts,data_matrix,boundary_collision,conversion_factor,msd_dtau_log,multiplier)
 % MSD_DTAU_PLOTTING Plot the time-averaged MSD(delta-tau) curve for each
 % particle as well as the ensemble-averaged MSD(delta-tau) curve.
 
 %%% PLOT SET-UP %%%
-time_fraction = 1/3;                                            %fraction of the total number of time points over which to generate the curve
-delta_taus = 1:round(time_pts*time_fraction);                   %time point intervals for displacement measurements
-sqd_dispmnts_lag_time = zeros(n,time_pts,size(delta_taus,2));   %storage for displacements at each time point interval
-rescaled_time = 0.1:0.1:time_pts*conversion_factor;             %time in seconds used for more realistic plotting
+time_fraction = 1/3;                                                                        %fraction of the total number of time points over which to generate the curve
+delta_taus = 1:round(time_pts*time_fraction);                                               %time point intervals for displacement measurements
+sqd_dispmnts_lag_time = zeros(n,time_pts,size(delta_taus,2));                               %storage for displacements at each time point interval
+rescaled_time = conversion_factor:conversion_factor:time_pts*conversion_factor;             %time in seconds used for more realistic plotting
 legend_array = {};
 
 % Compute the displacements for the given delta-tau values (multiples of delta-t)
@@ -23,6 +23,7 @@ for dt = delta_taus
 end
 
 % Remove erroneous displacements that result from a particle striking the boundary
+% SECOND LONGEST RUNTIME: approx. 100s for 100 particles
 for i = 1:n
     for j = 1:size(delta_taus,2)
         if boundary_collision(i) == 1 %only modify the displacement data if the given particle strikes the boundary
@@ -40,6 +41,7 @@ end
 
 %%% PLOTTING %%%
 % Set up the plot for the time-averaged squared displacements versus lag time curves
+% LONGEST RUNTIME: approx. 300s for 100 particles
 sdlt_plotting = zeros(n,size(delta_taus,2));
 for i = 1:n
     for j = 1:size(delta_taus,2)
@@ -56,7 +58,7 @@ for i = 1:n
     clearvars sdlt_plotting_particle
     sdlt_plotting_particle = sdlt_plotting(i,:);
     sdlt_plotting_particle = no_trailing_zeros(sdlt_plotting_particle); %remove trailing (excess) zeros if a given walk ended early
-    sdlt_plotting_particle = 10^-4.*(sdlt_plotting_particle/conversion_factor);
+    sdlt_plotting_particle = (1/multiplier).*(sdlt_plotting_particle/conversion_factor);
     plot(rescaled_time(1:length(sdlt_plotting_particle)),sdlt_plotting_particle,'Color',[0,0,0]);
     legend_array{end+1} = '';
     hold on
@@ -81,7 +83,7 @@ for i = 1:size(delta_taus,2)
 end
 
 % Plot the corresponding time-averaged MSD(delta-tau) curve
-msd_tau_plotting = 10^-4.*(msd_tau_plotting/conversion_factor);
+msd_tau_plotting = (1/multiplier).*(msd_tau_plotting/conversion_factor);
 plot(rescaled_time(1:length(msd_tau_plotting)),msd_tau_plotting,'LineWidth',3,'Color','red')
 legend_array{end+1} = 'Time-Averaged MSD(\Delta\tau)';
 
@@ -115,7 +117,7 @@ for i = 1:length(segments)
         [Dfit, alphafit] = msd_dtau_fitting(0.01,1,delta_taus(find(rescaled_time==segments(i)):find(rescaled_time==segments(i+1))),msd_tau_plotting(find(rescaled_time==segments(i)):find(rescaled_time==segments(i+1))));
         diffusivity_disp_str = strcat(['Diffusion constant from the line of best fit (' num2str(segments(i)) 's - ' num2str(segments(i+1)) 's' '): ' num2str(Dfit)]);
         alpha_disp_str = strcat(['Alpha from the line of best fit: (' num2str(segments(i)) 's - ' num2str(segments(i+1)) 's' '): ' num2str(alphafit)]);
-        plot((delta_taus(find(rescaled_time==segments(i)):find(rescaled_time==segments(i+1)))*conversion_factor),4.*Dfit.*delta_taus(find(rescaled_time==segments(i)):find(rescaled_time==segments(i+1))).^alphafit,'Linewidth',3,'Color','k','LineStyle','--')
+        plot((delta_taus(find(rescaled_time==segments(i)):find(rescaled_time==segments(i+1)))*conversion_factor),4.*Dfit.*delta_taus(find(rescaled_time==segments(i)):find(rescaled_time==segments(i+1))).^alphafit,'Linewidth',3,'Color','yellow','LineStyle','--')
         legend_str = strcat(['Line of Best Fit: ' num2str(segments(i)) 's - ' num2str(segments(i+1)) 's']);
         legend_array{end+1} = legend_str;
     catch %used for the final segment (from the final segment value in "segments" to the end of the lag time range)
@@ -126,7 +128,7 @@ for i = 1:length(segments)
             [Dfit, alphafit] = msd_dtau_fitting(0.01,1,delta_taus(find(rescaled_time==segments(i)):end),msd_tau_plotting(find(rescaled_time==segments(i)):end));
             diffusivity_disp_str = strcat(['Diffusion constant from the line of best fit (' num2str(segments(i)) 's - end): ' num2str(Dfit)]);
             alpha_disp_str = strcat(['Alpha from the line of best fit: (' num2str(segments(i)) 's - end): ' num2str(alphafit)]);
-            plot((delta_taus(find(rescaled_time==segments(i)):end)*conversion_factor),4.*Dfit.*delta_taus(find(rescaled_time==segments(i)):end).^alphafit,'Linewidth',3,'Color','k','LineStyle','--')
+            plot((delta_taus(find(rescaled_time==segments(i)):end)*conversion_factor),4.*Dfit.*delta_taus(find(rescaled_time==segments(i)):end).^alphafit,'Linewidth',3,'Color','yellow','LineStyle','--')
             legend_str = strcat(['Line of Best Fit: ' num2str(segments(i)) 's - end']);
             legend_array{end+1} = legend_str;
         end

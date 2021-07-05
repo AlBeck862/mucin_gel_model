@@ -11,7 +11,7 @@ P = 1/(sqrt(4*pi*D*tau))*exp(-(x.^2/(4*D*tau)));
 % Verify that the PDF is defined for all necessary x values
 cdf = cumtrapz(x,P);
 if cdf(end) < 0.99
-    error_message = strcat(['ERROR. The area under the PDF is only ' num2str(cdf(end)) '.']);
+    error_message = strcat(['WARNING. The area under the PDF is only ' num2str(cdf(end)) '.']);
     disp(error_message)
 end
 
