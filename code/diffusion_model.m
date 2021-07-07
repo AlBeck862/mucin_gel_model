@@ -3,8 +3,8 @@ tic %begin benchmarking (entire script)
 %%% PARAMETERS %%%
 % Lattice generation parameters
 % Note: the origin (i.e. (0,0)) of all images is in the top left corner due to MATLAB's data storage convention
-lattice_x = 7.5e3;                            %size of the lattice along the horizontal axis (number of lattice columns)
-lattice_y = 7.5e3;                            %size of the lattice along the vertical axis (number of lattice rows)
+lattice_x = 7.5e4;                            %size of the lattice along the horizontal axis (number of lattice columns)
+lattice_y = 7.5e4;                            %size of the lattice along the vertical axis (number of lattice rows)
 save_lattice = true;                        %false: don't save, true: save (save the lattice to a .mat file if it is newly generated)
 single_diffusivity_toggle = false;          %false: multiple subregions, true: uniform lattice (note: setting "import_lattice" to "true" bypasses this setting)
 single_diffusivity = 1000;                 %value of the diffusivity when constructing a single-diffusivity lattice (units: 10^-4 um^2/s)
@@ -12,7 +12,7 @@ import_lattice = true;                      %false: automatic lattice generation
 invert_grayscale = true;                   %false: do not invert the grayscale image, true: invert the grayscale image
 round_imported_lattice = true;              %false: do not modify the grayscale image's pixel values, true: round the grayscale image's pixel values to the nearest multiple of "round_imported_lattice_multiple"
 round_imported_lattice_multiple = 5;        %round the grayscale image's pixel values to the nearest multiple of this value
-multiplier = 100;                           %lattice scaling: multiply the provided units (e.g. micrometer) by the inverse of this value
+multiplier = 10000;                           %lattice scaling: multiply the provided units (e.g. micrometer) by the inverse of this value
 
 % Simulation parameters
 time_pts = 5000;                            %total time points (absolute time, camera frame-rate)
@@ -43,13 +43,19 @@ catch
 end
 
 %%% LATTICE VISUALIZATION %%%
-lattice_visualization(visualize_lattice,lattice)
+% Display and save the lattice visualization if the image is small enough
+if lattice_x*lattice_y <= 1e8
+    lattice_visualization(visualize_lattice,lattice)
+end
 
 %%% WALK SIMULATION %%%
 [data_matrix,boundary_collision] = walk_simulation(n,time_pts,start_type,lattice,save_data,x,all_cdf,diffusivities);
 
 %%% WALK VISUALIZATION %%%
-walk_visualization(n,lattice,data_matrix)
+% Display and save the walk visualizations if the image is small enough
+if lattice_x*lattice_y <= 1e8
+    walk_visualization(n,lattice,data_matrix)
+end
 
 %%% HISTOGRAMS %%%
 histogram_plotting(n,time_pts,multiples_delta_time,data_matrix,boundary_collision,save_data)

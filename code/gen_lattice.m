@@ -9,14 +9,18 @@ function [lattice,x,all_cdf,diffusivities] = gen_lattice(save_lattice,lattice_si
 %%% DIFFUSIVITY PARAMETERS %%%
 % % min_diffusivity = 0.1;  %units: um^2/s
 % % max_diffusivity = 1.25; %units: um^2/s
-min_diffusivity = 0.409;  %units: um^2/s
-max_diffusivity = 40.9; %units: um^2/s
+
+% Particle radius: r=60nm
+min_diffusivity = 0.041;  %units: um^2/s
+max_diffusivity = 4.090; %units: um^2/s
+
+% Particle radius: r=500nm
+% min_diffusivity = 0.005;  %units: um^2/s
+% max_diffusivity = 0.490; %units: um^2/s
 
 % Adjust the units of the diffusivities
-% min_diffusivity = multiplier*min_diffusivity; %units: 10^-4 um^2/s
-% max_diffusivity = multiplier*max_diffusivity; %units: 10^-4 um^2/s
-min_diffusivity = multiplier*min_diffusivity; %units: 10^-2 um^2/s
-max_diffusivity = multiplier*max_diffusivity; %units: 10^-2 um^2/s
+min_diffusivity = multiplier*min_diffusivity; %units: 10^-4 um^2/s
+max_diffusivity = multiplier*max_diffusivity; %units: 10^-4 um^2/s
 
 %%% LATTICE IMPORT OR GENERATION %%%
 if import_lattice == false %automatic lattice generation
@@ -77,6 +81,8 @@ else %manually-designed lattice import
     lattice = vq(1:end-1,1:end-1);                                  %trim the resized image to the correct dimensions
     final_sz = size(lattice);                                       %get the size of the processed image
     
+    whos lattice
+    
     % Invert the grayscale image if requested
     if invert_grayscale == true
         lattice = imcomplement(lattice);
@@ -92,12 +98,15 @@ else %manually-designed lattice import
     disp(lattice_disp_message)
     
     % Convert grayscale values to diffusivities
-    lattice = round(rescale(lattice,min_diffusivity,max_diffusivity));
-    diffusivities = unique(lattice);
+    lattice = uint16(round(rescale(lattice,min_diffusivity,max_diffusivity)));
+    
+    whos lattice
+    
+    diffusivities = double(unique(lattice));
 end
 
 % Generate the CDF corresponding to each diffusivity value in the lattice
-x = linspace(-165,165,1650000);
+x = linspace(-300,300,3000000);
 all_cdf = zeros(length(diffusivities),length(x));
 for i = 1:length(diffusivities)
     all_cdf(i,:) = gen_PDF(diffusivities(i),tau,x);

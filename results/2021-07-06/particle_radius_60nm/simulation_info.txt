@@ -1,0 +1,12 @@
+Lattice units: 10^-2 um scaling
+Lattice parameters: grayscale image of a real mucin gel
+Number of walks: 100
+Time points (each particle): 5000
+Random start locations: yes
+
+msd_dt: squared displacement versus absolute time curves + MSD(dt) curve
+msd_dtau: squared displacement versus lag time curves + time-averaged MSD(dtau) curve + lines of best fit plotted on a log-log graph
+
+histograms: normalized histograms of displacements in the x-direction and the y-direction for various multiples of delta-t (note: all histogram fits are Gaussian)
+step_sizes: folder of step-size plots for individual particles
+diffusivities: folder of bar plots of the frequency of each unique diffusivity encountered by individual particles
