@@ -16,7 +16,7 @@ multiplier = 10000;                           %lattice scaling: multiply the pro
 
 % Simulation parameters
 time_pts = 5000;                            %total time points (absolute time, camera frame-rate)
-n = 100;                                      %number of simulated particles.
+n = 25;                                      %number of simulated particles.
 start_type = 'random';                      %'center': all particles start at the center of the lattice, 'random': particles are each assigned a random start location, 'other_fixed': all particles start at a hard-coded location
 visualize_lattice = true;                   %false: no visualization, true: visualization
 conversion_factor = 0.1;                    %conversion factor, units of seconds per time point
@@ -58,15 +58,15 @@ if lattice_x*lattice_y <= 1e8
 end
 
 %%% HISTOGRAMS %%%
-histogram_plotting(n,time_pts,multiples_delta_time,data_matrix,boundary_collision,save_data)
+histogram_plotting(n,time_pts,multiples_delta_time,data_matrix,boundary_collision,save_data,conversion_factor,multiplier)
 
 %%% MSD(DELTA-T) %%%
-msd_dt_plotting(n,time_pts,data_matrix)
+msd_dt_plotting(n,time_pts,data_matrix,conversion_factor,multiplier)
 
 %%% TIME-AVERAGED MSD(DELTA-TAU) %%%
 msd_dtau_plotting(n,time_pts,data_matrix,boundary_collision,conversion_factor,msd_dtau_log,multiplier)
 
 %%% STEP-SIZE OVER TIME & DIFFUSIVITY FREQUENCIES %%%
-stepsize_dt_plotting(n,data_matrix,lattice,moving_avg_kernel)
+stepsize_dt_plotting(n,time_pts,data_matrix,lattice,moving_avg_kernel,conversion_factor,multiplier)
 
 toc %end benchmarking (entire script)

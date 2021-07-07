@@ -1,7 +1,10 @@
-function stepsize_dt_plotting(n,data_matrix,lattice,moving_avg_kernel)
+function stepsize_dt_plotting(n,time_pts,data_matrix,lattice,moving_avg_kernel,conversion_factor,multiplier)
 % STEPSIZE_IN_TIME Plot the step size over time for each particle in both
 % the x-direction and the y-direction. Plot the frequency of the
 % diffusivities encountered by each particle throughout the simulation.
+
+% Time in seconds used for more realistic plotting
+rescaled_time = conversion_factor:conversion_factor:time_pts*conversion_factor;
 
 for i = 1:n
     % Isolate the trajectory of the current particle
@@ -34,7 +37,7 @@ for i = 1:n
     
     % Bar plot of the diffusivities encountered by the current particle
     figure()
-%     histogram(current_particle_diffs)
+    unique_diffs = unique_diffs./multiplier;
     bar_data = bar(unique_diffs,tally,0.5);
     xtips = bar_data(1).XEndPoints;
     ytips = bar_data(1).YEndPoints;
@@ -42,7 +45,7 @@ for i = 1:n
     text(xtips,ytips,labels,'HorizontalAlignment','center','VerticalAlignment','bottom')
     diff_title_str = strcat(['Frequency of Diffusivities (Particle #' num2str(i) ')']);
     title(diff_title_str)
-    xlabel('Diffusivity [(10^{-4}\mum)^2/s]')
+    xlabel('Diffusivity [\mum^2/s]')
     ylabel('Frequency')
     grid on
     
@@ -51,32 +54,32 @@ for i = 1:n
     
     % Plot of the x-direction step-sizes of the current particle (corresponding diffusivities are overlaid)
     figure()
-    plot(movmean(stepsizes_x,moving_avg_kernel)) %plot using a moving average to smooth out the curve
+    plot(rescaled_time(1:length(stepsizes_x)),movmean(stepsizes_x./(sqrt(multiplier)),moving_avg_kernel)) %plot using a moving average to smooth out the curve
     x_dir_title_str = strcat(['Step-Size (x-direction) and Diffusivity vs. Absolute Time (Particle #' num2str(i) ')']);
     title(x_dir_title_str)
-    xlabel('Absolute Time [time points]')
-    ylabel('Step-Size |x| [(10^{-2}\mum)]')
+    xlabel('Absolute Time [seconds]')
+    ylabel('Step-Size |x| [\mum]')
     
     yyaxis right
-    plot(current_particle_diffs)
+    plot(rescaled_time(1:length(current_particle_diffs)),current_particle_diffs./multiplier)
 %     plot(movmean(current_particle_diffs,moving_avg_kernel)) %plot using a moving average to smooth out the curve
-    ylabel('Diffusivity [(10^{-4}\mum)^2/s]')
+    ylabel('Diffusivity [\mum^2/s]')
     
 	file_str = strcat(['/temp_results/step_sizes/stepsizes_dx_particle' num2str(i) '.jpeg']);
     saveas(gcf,[pwd file_str]);
     
     % Plot of the y-direction step-sizes of the current particle (corresponding diffusivities are overlaid)
     figure()
-    plot(movmean(stepsizes_y,moving_avg_kernel)) %plot using a moving average to smooth out the curve
+    plot(rescaled_time(1:length(stepsizes_y)),movmean(stepsizes_y./(sqrt(multiplier)),moving_avg_kernel)) %plot using a moving average to smooth out the curve
     y_dir_title_str = strcat(['Step-Size (y-direction) and Diffusivity vs. Absolute Time (Particle #' num2str(i) ')']);
     title(y_dir_title_str)
-    xlabel('Absolute Time [time points]')
-    ylabel('Step-Size |y| [(10^{-2}\mum)]')
+    xlabel('Absolute Time [seconds]')
+    ylabel('Step-Size |y| [\mum]')
     
 	yyaxis right
-    plot(current_particle_diffs)
+    plot(rescaled_time(1:length(current_particle_diffs)),current_particle_diffs./multiplier)
 %     plot(movmean(current_particle_diffs,moving_avg_kernel)) %plot using a moving average to smooth out the curve
-    ylabel('Diffusivity [(10^{-4}\mum)^2/s]')
+    ylabel('Diffusivity [\mum^2/s]')
     
 	file_str = strcat(['/temp_results/step_sizes/stepsizes_dy_particle' num2str(i) '.jpeg']);
     saveas(gcf,[pwd file_str]);

@@ -1,8 +1,6 @@
 function [data_matrix,boundary_collision] = walk_simulation(n,time_pts,start_type,lattice,save_data,x,all_cdf,diffusivities)
 % WALK_SIMULATION Simulate the diffusion of n particles over a maximum of
 % time_pts time points.
-% start_type -- determines the initial location of the particle (see the main script for details)
-% lattice -- stores the diffusivity values used to define a particle's diffusion given its location at a given time point
 
 tic %begin benchmarking (particle simulation)
 

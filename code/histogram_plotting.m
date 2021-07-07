@@ -1,4 +1,4 @@
-function histogram_plotting(n,time_pts,multiples_delta_time,data_matrix,boundary_collision,save_data)
+function histogram_plotting(n,time_pts,multiples_delta_time,data_matrix,boundary_collision,save_data,conversion_factor,multiplier)
 % HISTOGRAM_PLOTTING Plots two histograms (x-direction displacements and
 % y-direction displacements) for each multiple of delta-time.
 
@@ -46,22 +46,23 @@ for j = 1:size(multiples_delta_time,2)
         save(save_name_str,'all_displacement_storage_x','all_displacement_storage_y')
     end
     
-    % Combine the direction-specific data for histogram plotting
-    all_displacement_storage_both = [all_displacement_storage_x all_displacement_storage_y];
+    all_displacement_storage_x = all_displacement_storage_x./sqrt(multiplier);
+    all_displacement_storage_y = all_displacement_storage_y./sqrt(multiplier);
     
     % x-direction displacements histogram
     figure()
     hist_obj_x = histogram(all_displacement_storage_x, 'Normalization', 'pdf');
-    fit_data_x = fitdist(all_displacement_storage_x','Normal'); %obtain fit data
+    fit_data_x = fitdist(all_displacement_storage_x','Normal');                     %obtain fit data
+    hist_obj_x.NumBins = round(hist_obj_x.NumBins/3);                               %decrease the number of histogram bins to smooth out the histogram's shape
     
-	eval_vals_x = (hist_obj_x.BinEdges(1)-20:0.1:hist_obj_x.BinEdges(end)+20);
-    fit_data_pdf_x = pdf(fit_data_x,eval_vals_x); %compute the corresponding PDF
+	eval_vals_x = (hist_obj_x.BinEdges(1)-0.2:0.001:hist_obj_x.BinEdges(end)+0.2);
+    fit_data_pdf_x = pdf(fit_data_x,eval_vals_x);                                   %compute the corresponding PDF
     hold on
-    plot(eval_vals_x,fit_data_pdf_x,'LineWidth',2) %overlay the PDF on top of the histogram
+    plot(eval_vals_x,fit_data_pdf_x,'LineWidth',2)                                  %overlay the PDF on top of the histogram
     
     title('Step Size Distribution')
-    xlabel('\Deltax [10^{-2}\mum]')
-    hist_y_label_str = strcat(['P(\Deltax, \Delta\tau=' num2str(multiples_delta_time(j)) ' time points)']);
+    xlabel('\Deltax [\mum]')
+    hist_y_label_str = strcat(['P(\Deltax, \Delta\tau=' num2str(conversion_factor*multiples_delta_time(j)) ' seconds)']);
     ylabel(hist_y_label_str)
 	fit_legend_x = strcat(['Mean = ' num2str(fit_data_x.mu) ', Std. Dev. = ' num2str(fit_data_x.sigma)]);
     legend('Distribution',fit_legend_x)
@@ -72,43 +73,23 @@ for j = 1:size(multiples_delta_time,2)
 	% y-direction displacements histogram
     figure()
     hist_obj_y = histogram(all_displacement_storage_y, 'Normalization', 'pdf');
-	fit_data_y = fitdist(all_displacement_storage_y','Normal'); %obtain fit data
+	fit_data_y = fitdist(all_displacement_storage_y','Normal');                     %obtain fit data
+    hist_obj_y.NumBins = round(hist_obj_y.NumBins/3);                               %decrease the number of histogram bins to smooth out the histogram's shape
     
-	eval_vals_y = (hist_obj_y.BinEdges(1)-20:0.1:hist_obj_y.BinEdges(end)+20);
-    fit_data_pdf_y = pdf(fit_data_y,eval_vals_y); %compute the corresponding PDF
+	eval_vals_y = (hist_obj_y.BinEdges(1)-0.2:0.001:hist_obj_y.BinEdges(end)+0.2);
+    fit_data_pdf_y = pdf(fit_data_y,eval_vals_y);                                   %compute the corresponding PDF
     hold on
-    plot(eval_vals_y,fit_data_pdf_y,'LineWidth',2) %overlay the PDF on top of the histogram
+    plot(eval_vals_y,fit_data_pdf_y,'LineWidth',2)                                  %overlay the PDF on top of the histogram
     
     title('Step Size Distribution')
-    xlabel('\Deltay [10^{-2}\mum]')
-    hist_y_label_str = strcat(['P(\Deltay, \Delta\tau=' num2str(multiples_delta_time(j)) ' time points)']);
+    xlabel('\Deltay [\mum]')
+    hist_y_label_str = strcat(['P(\Deltay, \Delta\tau=' num2str(conversion_factor*multiples_delta_time(j)) ' seconds)']);
     ylabel(hist_y_label_str)
 	fit_legend_y = strcat(['Mean = ' num2str(fit_data_y.mu) ', Std. Dev. = ' num2str(fit_data_y.sigma)]);
     legend('Distribution',fit_legend_y)
 
 	file_str = strcat(['/temp_results/histograms/histogram_' num2str(multiples_delta_time(j)) 'dt_dy.jpeg']);
     saveas(gcf,[pwd file_str]);
-    
-    % Stacked displacements histogram
-% 	figure()
-%     hist_obj = histogram(all_displacement_storage_both, 'Normalization', 'pdf');
-%     fit_data = fitdist(all_displacement_storage_both','Normal'); %obtain fit data
-%     
-% %     fit_data = fitdist(all_displacement_storage_both','Logistic');
-% %     fit_data = fitdist(all_displacement_storage_both','Stable');
-%     
-%     eval_vals = (hist_obj.BinEdges(1)-20:0.1:hist_obj.BinEdges(end)+20);
-%     fit_data_pdf = pdf(fit_data,eval_vals); %compute the corresponding PDF
-%     hold on
-%     plot(eval_vals,fit_data_pdf,'LineWidth',2) %overlay the PDF on top of the histogram
-%     
-%     title('Step Size Distribution')
-%     xlabel('\Deltax, \Deltay [10^{-2}\mum]')
-%     hist_y_label_str = strcat(['P(\Deltax, \Deltay, \Delta\tau=' num2str(multiples_delta_time(j)) ' time points)']);
-%     ylabel(hist_y_label_str)
-%     fit_legend = strcat(['Mean = ' num2str(fit_data.mu) ', Std. Dev. = ' num2str(fit_data.sigma)]);
-%     legend('Distribution',fit_legend)
-    
 end
 
 end

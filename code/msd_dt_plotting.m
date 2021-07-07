@@ -1,9 +1,10 @@
-function msd_dt_plotting(n,time_pts,data_matrix)
+function msd_dt_plotting(n,time_pts,data_matrix,conversion_factor,multiplier)
 % MSD_DT_PLOTTING Plot the MSD(delta-time) curve for each particle as well
 % as the average MSD(delta-time) curve.
 
-% MSD(delta-t) plot
+% Plot set-up
 squared_displacements_abs_time = zeros(n,time_pts);
+rescaled_time = conversion_factor:conversion_factor:time_pts*conversion_factor; %time in seconds used for more realistic plotting
 
 % Compute the displacements from the start point to each point in the simulation
 for i = 1:n
@@ -19,8 +20,8 @@ figure()
 for i = 1:n
     plot_sdat = squared_displacements_abs_time(i,:);
     plot_sdat(plot_sdat==plot_sdat(end)) = []; %remove the artifically inflated final values (applicable only when a particle was immobilized by the boundary)
-%     plot(plot_sdat,'Color',[0,0,(1/n)*i])
-    plot(plot_sdat,'Color',[0,0,0])
+    plot_sdat = (1/multiplier).*(plot_sdat./conversion_factor);
+    plot(rescaled_time(1:length(plot_sdat)),plot_sdat,'Color','black')
     hold on
     
     clearvars plot_sdat
@@ -38,10 +39,11 @@ end
 
 % Plot the corresponding MSD(delta-t) curve
 msd_dt = sum(msd_dt_data,1)./sum(msd_dt_data~=0,1);
-plot(msd_dt,'LineWidth',2,'Color','red')
+msd_dt = (1/multiplier).*(msd_dt./conversion_factor);
+plot(rescaled_time(1:length(msd_dt)),msd_dt,'LineWidth',3,'Color','red')
 title('Squared Displacement vs. Absolute Time')
-xlabel('Absolute Time \Deltat [simulation time points]')
-ylabel('MSD(\Deltat) [(10^{-2}\mum)^2]')
+xlabel('Absolute Time \Deltat [seconds]')
+ylabel('MSD(\Deltat) [\mum^2]')
 
 saveas(gcf,[pwd '/temp_results/msd_dt.jpeg']);
 
