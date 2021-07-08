@@ -53,6 +53,7 @@ for i = 1:n
 end
 
 % Plot the time-averaged squared displacements versus lag time curves
+fid = fopen('temp_results/msd_dtau_fit_params.txt','wt'); %open a text file to store line-of-best-fit parameters
 figure()
 for i = 1:n
     clearvars sdlt_plotting_particle
@@ -69,6 +70,10 @@ for i = 1:n
     alpha_disp_str = strcat(['Alpha from the line of best fit (particle #' num2str(i) '): ' num2str(alphafit)]);
     disp(diffusivity_disp_str)
     disp(alpha_disp_str)
+    
+    % Print the fit parameters to the text file
+    fprintf(fid,'%s\n%s\n\n',diffusivity_disp_str,alpha_disp_str);
+    
 end
 
 % Convert NaN values (resulting from entirely-zero walks) to zeros to avoid breaking the MSD(delta-tau) curve
@@ -107,6 +112,9 @@ legend_array{end+1} = 'Overall Line of Best Fit';
 disp(diffusivity_disp_str)
 disp(alpha_disp_str)
 
+% Print the fit parameters to the text file
+fprintf(fid,'%s\n%s\n\n',diffusivity_disp_str,alpha_disp_str);
+
 %%% SEGMENTED LINES OF BEST FIT %%%
 log_times = log10(rescaled_time(1:length(sdlt_plotting_particle)));
 segments = rescaled_time(log_times==round(log_times)); %get all the powers of ten seconds
@@ -137,7 +145,16 @@ for i = 1:length(segments)
     disp(diffusivity_disp_str)
     disp(alpha_disp_str)
     
+    % Print the fit parameters to the text file
+    if i == length(segments)
+        fprintf(fid,'%s\n%s',diffusivity_disp_str,alpha_disp_str);
+    else
+        fprintf(fid,'%s\n%s\n\n',diffusivity_disp_str,alpha_disp_str);
+    end
+    
 end
+
+fclose(fid); %close the text file
 
 legend(legend_array,'Location','southeast')
 

@@ -67,6 +67,6 @@ msd_dt_plotting(n,time_pts,data_matrix,conversion_factor,multiplier)
 msd_dtau_plotting(n,time_pts,data_matrix,boundary_collision,conversion_factor,msd_dtau_log,multiplier)
 
 %%% STEP-SIZE OVER TIME & DIFFUSIVITY FREQUENCIES %%%
-stepsize_dt_plotting(n,time_pts,data_matrix,lattice,moving_avg_kernel,conversion_factor,multiplier)
+stepsize_dt_plotting(n,time_pts,data_matrix,lattice,moving_avg_kernel,conversion_factor,multiplier,diffusivities)
 
 toc %end benchmarking (entire script)

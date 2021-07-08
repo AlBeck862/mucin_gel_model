@@ -1,10 +1,13 @@
-function stepsize_dt_plotting(n,time_pts,data_matrix,lattice,moving_avg_kernel,conversion_factor,multiplier)
+function stepsize_dt_plotting(n,time_pts,data_matrix,lattice,moving_avg_kernel,conversion_factor,multiplier,diffusivities)
 % STEPSIZE_IN_TIME Plot the step size over time for each particle in both
 % the x-direction and the y-direction. Plot the frequency of the
 % diffusivities encountered by each particle throughout the simulation.
 
 % Time in seconds used for more realistic plotting
 rescaled_time = conversion_factor:conversion_factor:time_pts*conversion_factor;
+
+% Storage for the diffusivities encountered by all the particles
+all_particle_diffs = cell(n,1);
 
 for i = 1:n
     % Isolate the trajectory of the current particle
@@ -34,6 +37,8 @@ for i = 1:n
 	[unique_diffs,~,idx_c] = unique(current_particle_diffs);    %determine the unique diffusivities encountered
     tally = accumarray(idx_c,1);                                %count the number of times each unique diffusivity occurs
     tally = tally';
+    
+    all_particle_diffs{i} = current_particle_diffs;           %collect the data from each particle for the heatmap
     
     % Bar plot of the diffusivities encountered by the current particle
     figure()
@@ -85,5 +90,20 @@ for i = 1:n
     saveas(gcf,[pwd file_str]);
     
 end
+
+% Heatmap of the diffusivities encountered by every particle
+possible_diffusivities = [diffusivities;diffusivities(end)+1]; %append an extra value for compatibility with the groupcounts function
+all_particle_diffs_counts = zeros(i,length(possible_diffusivities)-1);
+for i = 1:i
+    [single_particle_diffs_counts,~] = groupcounts(all_particle_diffs{i}',possible_diffusivities','IncludeEmptyGroups',true);
+    all_particle_diffs_counts(i,:) = single_particle_diffs_counts;
+end
+
+h = heatmap(all_particle_diffs_counts);
+% h.XDisplayLabels = diffs;
+% h.YDisplayLabels = particles;
+
+file_str = strcat('/temp_results/diffusivity_heatmap.jpeg');
+saveas(gcf,[pwd file_str]);
 
 end

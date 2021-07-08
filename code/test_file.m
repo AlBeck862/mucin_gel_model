@@ -744,3 +744,31 @@
 % toc
 
 %%%%%
+
+possibilities = linspace(1,1000,19); % DIFFUSIVITIES
+possibilities = [possibilities possibilities(end)+1];
+test_vals = randsample(possibilities,1000,true);
+test = reshape(test_vals,[100,10]) % DIFFUSIVITIES SAMPLED BY EACH PARTICLE AT EACH TIME POINT
+% test = randi(10,20,10)
+% possibilities = 1:11;
+
+all_gc = zeros(size(test,1),length(possibilities)-1);
+for i = 1:size(test,1)
+    [GC,GR] = groupcounts(test(i,:)',possibilities,'IncludeEmptyGroups',true);
+    all_gc(i,:) = GC;
+end
+
+all_gc
+
+particles = {'1';'2';'3';'4';'5';'6';'7';'8';'9';'10';'11';'12';'13';'14';'15';'16';'17';'18';'19';'20'};
+diffs = {'A';'B';'C';'D';'E';'F';'G';'H';'I';'J';'K';'L';'M';'N';'O';'P';'Q';'R';'S'};
+% tb = table(all_gc)
+
+% tb = array2table(all_gc) %,'RowNames',particles,'VariableNames',diffs,'DimensionNames',{'Diffusivities','Particles'})
+
+% heatmap(1:20,possibilities,all_gc)
+
+h = heatmap(all_gc);
+h.XDisplayLabels = diffs;
+h.YDisplayLabels = particles;
+
