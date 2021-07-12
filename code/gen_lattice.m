@@ -6,12 +6,12 @@ function [lattice,x,all_cdf,diffusivities] = gen_lattice(save_lattice,lattice_si
 % % max_diffusivity = 1.25; %units: um^2/s
 
 % Particle radius: r=60nm
-% min_diffusivity = 0.041;  %units: um^2/s
-% max_diffusivity = 4.090; %units: um^2/s
+min_diffusivity = 0.041;  %units: um^2/s
+max_diffusivity = 4.090; %units: um^2/s
 
 % Particle radius: r=500nm
-min_diffusivity = 0.005;  %units: um^2/s
-max_diffusivity = 0.490; %units: um^2/s
+% min_diffusivity = 0.005;  %units: um^2/s
+% max_diffusivity = 0.490; %units: um^2/s
 
 % Adjust the units of the diffusivities
 min_diffusivity = multiplier*min_diffusivity; %units: 10^-4 um^2/s

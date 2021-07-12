@@ -91,19 +91,62 @@ for i = 1:n
     
 end
 
-% Heatmap of the diffusivities encountered by every particle
+% Heatmaps of the diffusivities encountered by every particle (limit of 25 particles per heatmap for improved readability)
 possible_diffusivities = [diffusivities;diffusivities(end)+1]; %append an extra value for compatibility with the groupcounts function
 all_particle_diffs_counts = zeros(i,length(possible_diffusivities)-1);
-for i = 1:i
+for i = 1:n
     [single_particle_diffs_counts,~] = groupcounts(all_particle_diffs{i}',possible_diffusivities','IncludeEmptyGroups',true);
     all_particle_diffs_counts(i,:) = single_particle_diffs_counts;
 end
 
-h = heatmap(all_particle_diffs_counts);
-% h.XDisplayLabels = diffs;
-% h.YDisplayLabels = particles;
-
-file_str = strcat('/temp_results/diffusivity_heatmap.jpeg');
-saveas(gcf,[pwd file_str]);
-
+num_heatmap_sections = ceil(n/25);                                                          %get the number of 25-particle sections
+for section = 1:num_heatmap_sections
+    % Slice the appropriate data for the current heatmap
+    if section == num_heatmap_sections
+        start_idx = ((section-1)*25)+1;                                                     %first particle of the section
+        end_idx = size(all_particle_diffs_counts,1);                                        %final particle of the section
+        all_particle_diffs_counts_section = all_particle_diffs_counts(start_idx:end_idx,:); %slice the appropriate set of particles from the matrix
+    else
+        start_idx = ((section-1)*25)+1;                                                     %first particle of the section
+        end_idx = start_idx+24;                                                             %final particle of the section
+        all_particle_diffs_counts_section = all_particle_diffs_counts(start_idx:end_idx,:); %slice the appropriate set of particles from the matrix
+    end
+    
+    % Set up the heatmap
+    figure()
+    colormap jet
+    imagesc(all_particle_diffs_counts_section,[0 time_pts])                     %the second argument set the colormap limits (minimum and maximum frequencies)
+    colorbar
+    xticks(1:length(diffusivities))
+    xticklabels(compose('%.4f',str2double(string(diffusivities/multiplier))))   %convert the units of diffusivity to squared micrometers per second and display the diffusivities with four-decimal precision
+    yticks(1:size(all_particle_diffs_counts_section,1))
+    yticklabels(string(start_idx:end_idx))
+    xlabel('Diffusivity [\mum^2]')
+    ylabel('Particle Number')
+    heatmap_title_str = strcat(['Heatmap of Diffusivities, Part ' num2str(section) ' of ' num2str(num_heatmap_sections) ' (Frequencies)']);
+    title(heatmap_title_str)
+    
+    % Draw the gridlines
+    hold on
+    for i = 1:(end_idx-start_idx+1)
+       plot([.5,length(diffusivities)+.5],[i-.5,i-.5],'k-');
+    end
+    for cell_y_id = 1:length(diffusivities)
+       plot([cell_y_id-.5,cell_y_id-.5],[.5,size(all_particle_diffs_counts_section,1)+.5],'k-');
+    end
+    
+    % Add a circular marker in the heatmap cell representing the first diffusivity encountered by each particle
+    current_heatmap_particle = 1;
+    for i = start_idx:end_idx
+        particle_diffs = all_particle_diffs{i};
+        first_diffusivity = particle_diffs(1);
+        heatmap_diffusivity_idx = find(diffusivities==first_diffusivity);
+        plot(heatmap_diffusivity_idx,current_heatmap_particle,'Marker','o','MarkerFaceColor','y','MarkerEdgeColor','k')
+        current_heatmap_particle = current_heatmap_particle + 1;
+    end
+    
+    file_str = strcat(['/temp_results/heatmaps/diffusivity_heatmap_part' num2str(section) '.jpeg']);
+    saveas(gcf,[pwd file_str]);
+    
+end
 end
