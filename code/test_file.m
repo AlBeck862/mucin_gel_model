@@ -745,30 +745,53 @@
 
 %%%%%
 
-possibilities = linspace(1,1000,19); % DIFFUSIVITIES
-possibilities = [possibilities possibilities(end)+1];
-test_vals = randsample(possibilities,1000,true);
-test = reshape(test_vals,[100,10]) % DIFFUSIVITIES SAMPLED BY EACH PARTICLE AT EACH TIME POINT
-% test = randi(10,20,10)
-% possibilities = 1:11;
+% possibilities = linspace(1,1000,19); % DIFFUSIVITIES
+% possibilities = [possibilities possibilities(end)+1];
+% test_vals = randsample(possibilities,1000,true);
+% test = reshape(test_vals,[100,10]) % DIFFUSIVITIES SAMPLED BY EACH PARTICLE AT EACH TIME POINT
+% % test = randi(10,20,10)
+% % possibilities = 1:11;
+% 
+% all_gc = zeros(size(test,1),length(possibilities)-1);
+% for i = 1:size(test,1)
+%     [GC,GR] = groupcounts(test(i,:)',possibilities,'IncludeEmptyGroups',true);
+%     all_gc(i,:) = GC;
+% end
+% 
+% all_gc
+% 
+% particles = {'1';'2';'3';'4';'5';'6';'7';'8';'9';'10';'11';'12';'13';'14';'15';'16';'17';'18';'19';'20'};
+% diffs = {'A';'B';'C';'D';'E';'F';'G';'H';'I';'J';'K';'L';'M';'N';'O';'P';'Q';'R';'S'};
+% % tb = table(all_gc)
+% 
+% % tb = array2table(all_gc) %,'RowNames',particles,'VariableNames',diffs,'DimensionNames',{'Diffusivities','Particles'})
+% 
+% % heatmap(1:20,possibilities,all_gc)
+% 
+% h = heatmap(all_gc);
+% h.XDisplayLabels = diffs;
+% h.YDisplayLabels = particles;
 
-all_gc = zeros(size(test,1),length(possibilities)-1);
-for i = 1:size(test,1)
-    [GC,GR] = groupcounts(test(i,:)',possibilities,'IncludeEmptyGroups',true);
-    all_gc(i,:) = GC;
+%%%%%
+
+x = -25:0.1:25;
+mu = 0;
+sigmas = 1:0.1:5;
+all_p = zeros(1,length(x));
+
+figure()
+for sigma = sigmas
+    p = (1/(sigma*sqrt(2*pi))).*exp(-(1/2).*((x-mu)./sigma).^2);
+    all_p = all_p + p;
+    plot(x,p)
+    hold on
 end
+title('All Gaussian Curves (\mu=0, \sigma=[1:0.1:5])')
+xlabel('x')
+ylabel('y')
 
-all_gc
+f = fit(x',all_p','gauss1');
 
-particles = {'1';'2';'3';'4';'5';'6';'7';'8';'9';'10';'11';'12';'13';'14';'15';'16';'17';'18';'19';'20'};
-diffs = {'A';'B';'C';'D';'E';'F';'G';'H';'I';'J';'K';'L';'M';'N';'O';'P';'Q';'R';'S'};
-% tb = table(all_gc)
-
-% tb = array2table(all_gc) %,'RowNames',particles,'VariableNames',diffs,'DimensionNames',{'Diffusivities','Particles'})
-
-% heatmap(1:20,possibilities,all_gc)
-
-h = heatmap(all_gc);
-h.XDisplayLabels = diffs;
-h.YDisplayLabels = particles;
-
+figure()
+plot(f,x,all_p)
+title('Sum of Gaussian Curves and Gaussian Fit')

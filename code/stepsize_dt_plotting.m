@@ -121,7 +121,7 @@ for section = 1:num_heatmap_sections
     xticklabels(compose('%.4f',str2double(string(diffusivities/multiplier))))   %convert the units of diffusivity to squared micrometers per second and display the diffusivities with four-decimal precision
     yticks(1:size(all_particle_diffs_counts_section,1))
     yticklabels(string(start_idx:end_idx))
-    xlabel('Diffusivity [\mum^2]')
+    xlabel('Diffusivity [\mum^2/s]')
     ylabel('Particle Number')
     heatmap_title_str = strcat(['Heatmap of Diffusivities, Part ' num2str(section) ' of ' num2str(num_heatmap_sections) ' (Frequencies)']);
     title(heatmap_title_str)

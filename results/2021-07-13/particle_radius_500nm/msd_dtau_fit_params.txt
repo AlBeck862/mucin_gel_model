@@ -1,0 +1,314 @@
+Diffusion constant from the line of best fit (particle #1): 0.3925
+Alpha from the line of best fit (particle #1): 0.86878
+
+Diffusion constant from the line of best fit (particle #2): 0.61085
+Alpha from the line of best fit (particle #2): 0.87458
+
+Diffusion constant from the line of best fit (particle #3): 0.53637
+Alpha from the line of best fit (particle #3): 0.9701
+
+Diffusion constant from the line of best fit (particle #4): 0.13191
+Alpha from the line of best fit (particle #4): 1.1858
+
+Diffusion constant from the line of best fit (particle #5): 0.85808
+Alpha from the line of best fit (particle #5): 0.68311
+
+Diffusion constant from the line of best fit (particle #6): 0.44556
+Alpha from the line of best fit (particle #6): 0.75738
+
+Diffusion constant from the line of best fit (particle #7): 0.34664
+Alpha from the line of best fit (particle #7): 0.95303
+
+Diffusion constant from the line of best fit (particle #8): 0.60591
+Alpha from the line of best fit (particle #8): 0.86102
+
+Diffusion constant from the line of best fit (particle #9): 0.62682
+Alpha from the line of best fit (particle #9): 0.86367
+
+Diffusion constant from the line of best fit (particle #10): 0.35605
+Alpha from the line of best fit (particle #10): 0.90166
+
+Diffusion constant from the line of best fit (particle #11): 0.53393
+Alpha from the line of best fit (particle #11): 0.83705
+
+Diffusion constant from the line of best fit (particle #12): 0.23079
+Alpha from the line of best fit (particle #12): 1.0475
+
+Diffusion constant from the line of best fit (particle #13): 0.5642
+Alpha from the line of best fit (particle #13): 0.84546
+
+Diffusion constant from the line of best fit (particle #14): 0.35177
+Alpha from the line of best fit (particle #14): 0.97192
+
+Diffusion constant from the line of best fit (particle #15): 0.39929
+Alpha from the line of best fit (particle #15): 0.99243
+
+Diffusion constant from the line of best fit (particle #16): 0.86418
+Alpha from the line of best fit (particle #16): 0.72383
+
+Diffusion constant from the line of best fit (particle #17): 0.11595
+Alpha from the line of best fit (particle #17): 1.1568
+
+Diffusion constant from the line of best fit (particle #18): 0.21101
+Alpha from the line of best fit (particle #18): 1.1851
+
+Diffusion constant from the line of best fit (particle #19): 0.49171
+Alpha from the line of best fit (particle #19): 0.89293
+
+Diffusion constant from the line of best fit (particle #20): 0.12315
+Alpha from the line of best fit (particle #20): 1.1204
+
+Diffusion constant from the line of best fit (particle #21): 0.19332
+Alpha from the line of best fit (particle #21): 1.1009
+
+Diffusion constant from the line of best fit (particle #22): 0.32274
+Alpha from the line of best fit (particle #22): 0.95093
+
+Diffusion constant from the line of best fit (particle #23): 1.083
+Alpha from the line of best fit (particle #23): 0.71547
+
+Diffusion constant from the line of best fit (particle #24): 0.27445
+Alpha from the line of best fit (particle #24): 1.1007
+
+Diffusion constant from the line of best fit (particle #25): 0.20913
+Alpha from the line of best fit (particle #25): 1.0123
+
+Diffusion constant from the line of best fit (particle #26): 0.29934
+Alpha from the line of best fit (particle #26): 0.98164
+
+Diffusion constant from the line of best fit (particle #27): 0.39093
+Alpha from the line of best fit (particle #27): 1.0015
+
+Diffusion constant from the line of best fit (particle #28): 0.1245
+Alpha from the line of best fit (particle #28): 1.1999
+
+Diffusion constant from the line of best fit (particle #29): 0.33007
+Alpha from the line of best fit (particle #29): 0.96197
+
+Diffusion constant from the line of best fit (particle #30): 0.1905
+Alpha from the line of best fit (particle #30): 0.87435
+
+Diffusion constant from the line of best fit (particle #31): 0.19019
+Alpha from the line of best fit (particle #31): 1.0804
+
+Diffusion constant from the line of best fit (particle #32): 0.12024
+Alpha from the line of best fit (particle #32): 1.1131
+
+Diffusion constant from the line of best fit (particle #33): 0.86492
+Alpha from the line of best fit (particle #33): 0.75881
+
+Diffusion constant from the line of best fit (particle #34): 0.58642
+Alpha from the line of best fit (particle #34): 0.89262
+
+Diffusion constant from the line of best fit (particle #35): 0.32096
+Alpha from the line of best fit (particle #35): 1.0586
+
+Diffusion constant from the line of best fit (particle #36): 0.48207
+Alpha from the line of best fit (particle #36): 0.94764
+
+Diffusion constant from the line of best fit (particle #37): 0.55248
+Alpha from the line of best fit (particle #37): 0.86566
+
+Diffusion constant from the line of best fit (particle #38): 0.25029
+Alpha from the line of best fit (particle #38): 1.0546
+
+Diffusion constant from the line of best fit (particle #39): 0.35823
+Alpha from the line of best fit (particle #39): 0.9406
+
+Diffusion constant from the line of best fit (particle #40): 0.064927
+Alpha from the line of best fit (particle #40): 1.222
+
+Diffusion constant from the line of best fit (particle #41): 0.46438
+Alpha from the line of best fit (particle #41): 0.93113
+
+Diffusion constant from the line of best fit (particle #42): 0.25575
+Alpha from the line of best fit (particle #42): 1.0029
+
+Diffusion constant from the line of best fit (particle #43): 0.31542
+Alpha from the line of best fit (particle #43): 0.99698
+
+Diffusion constant from the line of best fit (particle #44): 0.49079
+Alpha from the line of best fit (particle #44): 0.89947
+
+Diffusion constant from the line of best fit (particle #45): 0.21048
+Alpha from the line of best fit (particle #45): 1.0909
+
+Diffusion constant from the line of best fit (particle #46): 0.53066
+Alpha from the line of best fit (particle #46): 0.86852
+
+Diffusion constant from the line of best fit (particle #47): 0.57123
+Alpha from the line of best fit (particle #47): 0.91846
+
+Diffusion constant from the line of best fit (particle #48): 0.33509
+Alpha from the line of best fit (particle #48): 1.0173
+
+Diffusion constant from the line of best fit (particle #49): 0.42216
+Alpha from the line of best fit (particle #49): 0.96128
+
+Diffusion constant from the line of best fit (particle #50): 0.17159
+Alpha from the line of best fit (particle #50): 1.1349
+
+Diffusion constant from the line of best fit (particle #51): 0.50615
+Alpha from the line of best fit (particle #51): 0.88131
+
+Diffusion constant from the line of best fit (particle #52): 0.34297
+Alpha from the line of best fit (particle #52): 1.0141
+
+Diffusion constant from the line of best fit (particle #53): 0.13182
+Alpha from the line of best fit (particle #53): 1.0919
+
+Diffusion constant from the line of best fit (particle #54): 0.15976
+Alpha from the line of best fit (particle #54): 1.1743
+
+Diffusion constant from the line of best fit (particle #55): 0.75751
+Alpha from the line of best fit (particle #55): 0.78226
+
+Diffusion constant from the line of best fit (particle #56): 0.41667
+Alpha from the line of best fit (particle #56): 1.0177
+
+Diffusion constant from the line of best fit (particle #57): 0.32637
+Alpha from the line of best fit (particle #57): 0.97224
+
+Diffusion constant from the line of best fit (particle #58): 0.20399
+Alpha from the line of best fit (particle #58): 1.0718
+
+Diffusion constant from the line of best fit (particle #59): 0.83227
+Alpha from the line of best fit (particle #59): 0.7237
+
+Diffusion constant from the line of best fit (particle #60): 0.46136
+Alpha from the line of best fit (particle #60): 0.90511
+
+Diffusion constant from the line of best fit (particle #61): 0.40328
+Alpha from the line of best fit (particle #61): 0.9439
+
+Diffusion constant from the line of best fit (particle #62): 0.41055
+Alpha from the line of best fit (particle #62): 0.90436
+
+Diffusion constant from the line of best fit (particle #63): 0.068674
+Alpha from the line of best fit (particle #63): 1.2999
+
+Diffusion constant from the line of best fit (particle #64): 0.07314
+Alpha from the line of best fit (particle #64): 1.294
+
+Diffusion constant from the line of best fit (particle #65): 0.10982
+Alpha from the line of best fit (particle #65): 1.2164
+
+Diffusion constant from the line of best fit (particle #66): 0.30271
+Alpha from the line of best fit (particle #66): 0.98705
+
+Diffusion constant from the line of best fit (particle #67): 0.067346
+Alpha from the line of best fit (particle #67): 1.3581
+
+Diffusion constant from the line of best fit (particle #68): 0.50807
+Alpha from the line of best fit (particle #68): 0.81648
+
+Diffusion constant from the line of best fit (particle #69): 0.7239
+Alpha from the line of best fit (particle #69): 0.76084
+
+Diffusion constant from the line of best fit (particle #70): 0.32692
+Alpha from the line of best fit (particle #70): 0.92983
+
+Diffusion constant from the line of best fit (particle #71): 0.19323
+Alpha from the line of best fit (particle #71): 1.073
+
+Diffusion constant from the line of best fit (particle #72): 0.0536
+Alpha from the line of best fit (particle #72): 1.3334
+
+Diffusion constant from the line of best fit (particle #73): 0.56486
+Alpha from the line of best fit (particle #73): 0.78748
+
+Diffusion constant from the line of best fit (particle #74): 0.4379
+Alpha from the line of best fit (particle #74): 0.982
+
+Diffusion constant from the line of best fit (particle #75): 0.31902
+Alpha from the line of best fit (particle #75): 1.041
+
+Diffusion constant from the line of best fit (particle #76): 0.8313
+Alpha from the line of best fit (particle #76): 0.74736
+
+Diffusion constant from the line of best fit (particle #77): 0.60867
+Alpha from the line of best fit (particle #77): 0.87142
+
+Diffusion constant from the line of best fit (particle #78): 0.45703
+Alpha from the line of best fit (particle #78): 0.92291
+
+Diffusion constant from the line of best fit (particle #79): 0.30344
+Alpha from the line of best fit (particle #79): 0.94233
+
+Diffusion constant from the line of best fit (particle #80): 0.0076593
+Alpha from the line of best fit (particle #80): 1.1092
+
+Diffusion constant from the line of best fit (particle #81): 0.12038
+Alpha from the line of best fit (particle #81): 1.1495
+
+Diffusion constant from the line of best fit (particle #82): 0.064433
+Alpha from the line of best fit (particle #82): 1.2568
+
+Diffusion constant from the line of best fit (particle #83): 0.20595
+Alpha from the line of best fit (particle #83): 1.0723
+
+Diffusion constant from the line of best fit (particle #84): 0.28301
+Alpha from the line of best fit (particle #84): 0.97999
+
+Diffusion constant from the line of best fit (particle #85): 0.085542
+Alpha from the line of best fit (particle #85): 1.1672
+
+Diffusion constant from the line of best fit (particle #86): 0.22497
+Alpha from the line of best fit (particle #86): 1.056
+
+Diffusion constant from the line of best fit (particle #87): 0.26429
+Alpha from the line of best fit (particle #87): 1.0394
+
+Diffusion constant from the line of best fit (particle #88): 0.19474
+Alpha from the line of best fit (particle #88): 1.0736
+
+Diffusion constant from the line of best fit (particle #89): 0.21409
+Alpha from the line of best fit (particle #89): 0.89156
+
+Diffusion constant from the line of best fit (particle #90): 0.29146
+Alpha from the line of best fit (particle #90): 0.94057
+
+Diffusion constant from the line of best fit (particle #91): 0.24714
+Alpha from the line of best fit (particle #91): 1.0584
+
+Diffusion constant from the line of best fit (particle #92): 0.44671
+Alpha from the line of best fit (particle #92): 0.87129
+
+Diffusion constant from the line of best fit (particle #93): 0.29258
+Alpha from the line of best fit (particle #93): 1.0532
+
+Diffusion constant from the line of best fit (particle #94): 0.34758
+Alpha from the line of best fit (particle #94): 0.97221
+
+Diffusion constant from the line of best fit (particle #95): 0.67252
+Alpha from the line of best fit (particle #95): 0.79272
+
+Diffusion constant from the line of best fit (particle #96): 0.90747
+Alpha from the line of best fit (particle #96): 0.70932
+
+Diffusion constant from the line of best fit (particle #97): 0.17198
+Alpha from the line of best fit (particle #97): 1.0916
+
+Diffusion constant from the line of best fit (particle #98): 0.70064
+Alpha from the line of best fit (particle #98): 0.85556
+
+Diffusion constant from the line of best fit (particle #99): 0.40097
+Alpha from the line of best fit (particle #99): 0.96828
+
+Diffusion constant from the line of best fit (particle #100): 0.11741
+Alpha from the line of best fit (particle #100): 1.2363
+
+Diffusion constant from the line of best fit: 0.28682
+Alpha from the line of best fit: 1.0091
+
+Diffusion constant from the line of best fit (0.1s - 1s): 0.30468
+Alpha from the line of best fit: (0.1s - 1s): 1.0002
+
+Diffusion constant from the line of best fit (1s - 10s): 0.31394
+Alpha from the line of best fit: (1s - 10s): 0.98903
+
+Diffusion constant from the line of best fit (10s - 100s): 0.27942
+Alpha from the line of best fit: (10s - 100s): 1.0124
+
+Diffusion constant from the line of best fit (100s - end): 0.28198
+Alpha from the line of best fit: (100s - end): 1.0123
