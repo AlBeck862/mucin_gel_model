@@ -81,16 +81,35 @@ sdlt_plotting(isnan(sdlt_plotting)) = 0;
 
 % Set up the plot for the corresponding time-averaged MSD(delta-tau) curve
 msd_tau_plotting = zeros(1,size(delta_taus,2));
+variance_storage = zeros(1,size(delta_taus,2)); %%%NEW
+std_storage = zeros(1,size(delta_taus,2)); %%%NEW
 for i = 1:size(delta_taus,2)
     sdlt_plotting_no_zeros = sdlt_plotting(:,i);
     sdlt_plotting_no_zeros(sdlt_plotting_no_zeros==0) = [];
     msd_tau_plotting(i) = mean(sdlt_plotting_no_zeros);
+    
+    % Heterogeneity Ratio (HR) and errorbar calculations %%%NEW
+    sdlt_plotting_no_zeros = (1/multiplier).*(sdlt_plotting_no_zeros/conversion_factor);
+    variance_storage(i) = var(sdlt_plotting_no_zeros); %variance of data at each tau %%%NEW
+    std_storage(i) = std(sdlt_plotting_no_zeros); %std of data at each tau %%%NEW
 end
 
 % Plot the corresponding time-averaged MSD(delta-tau) curve
 msd_tau_plotting = (1/multiplier).*(msd_tau_plotting/conversion_factor);
+msd_tau_plotting_squared = msd_tau_plotting.^2; %%%NEW
 plot(rescaled_time(1:length(msd_tau_plotting)),msd_tau_plotting,'LineWidth',3,'Color','red')
+
+% Errorbars plotting %%%NEW
+hold on
+ebar_plot = errorbar(rescaled_time(1:round(length(msd_tau_plotting)/25):length(msd_tau_plotting)),msd_tau_plotting(1:round(end/25):end),std_storage(1:round(length(msd_tau_plotting)/25):length(msd_tau_plotting)));
+ebar_plot.Color = 'red';
+ebar_plot.LineWidth = 1;
+
 legend_array{end+1} = 'Time-Averaged MSD(\Delta\tau)';
+
+legend_array{end+1} = 'Errorbars (Standard Deviations)'; %%%NEW
+
+hr_vals = variance_storage./msd_tau_plotting_squared; %%%NEW
 
 % Plot title and axis labels
 title('Time-Averaged Squared Displacement vs. Lag Time')
@@ -155,6 +174,21 @@ for i = 1:length(segments)
 end
 
 fclose(fid); %close the text file
+
+% Display and save certain HR values %%%NEW
+fid = fopen('temp_results/hr_values.txt','wt'); %open a text file to store line-of-best-fit parameters
+for i = 1:25
+    disp_time_arr = rescaled_time(1:round(length(msd_tau_plotting)/25):length(msd_tau_plotting));
+    disp_hr_arr = hr_vals(1:round(length(msd_tau_plotting)/25):length(msd_tau_plotting));
+    hr_disp_str = strcat(['For a lag time of ' num2str(disp_time_arr(i)) ' seconds, the HR value is ' num2str(disp_hr_arr(i)) '.']);
+    disp(hr_disp_str)
+    
+    if i == 25
+        fprintf(fid,'%s',hr_disp_str);
+    else
+        fprintf(fid,'%s\n',hr_disp_str);
+    end
+end
 
 legend(legend_array,'Location','southeast')
 
