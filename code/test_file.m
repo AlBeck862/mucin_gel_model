@@ -774,24 +774,43 @@
 
 %%%%%
 
-x = -25:0.1:25;
-mu = 0;
-sigmas = 1:0.1:5;
-all_p = zeros(1,length(x));
+% x = -25:0.1:25;
+% mu = 0;
+% sigmas = 1:0.1:5;
+% all_p = zeros(1,length(x));
+% 
+% figure()
+% for sigma = sigmas
+%     p = (1/(sigma*sqrt(2*pi))).*exp(-(1/2).*((x-mu)./sigma).^2);
+%     all_p = all_p + p;
+%     plot(x,p)
+%     hold on
+% end
+% title('All Gaussian Curves (\mu=0, \sigma=[1:0.1:5])')
+% xlabel('x')
+% ylabel('y')
+% 
+% f = fit(x',all_p','gauss1');
+% 
+% figure()
+% plot(f,x,all_p)
+% title('Sum of Gaussian Curves and Gaussian Fit')
 
-figure()
-for sigma = sigmas
-    p = (1/(sigma*sqrt(2*pi))).*exp(-(1/2).*((x-mu)./sigma).^2);
-    all_p = all_p + p;
-    plot(x,p)
-    hold on
-end
-title('All Gaussian Curves (\mu=0, \sigma=[1:0.1:5])')
-xlabel('x')
-ylabel('y')
+%%%%%
 
-f = fit(x',all_p','gauss1');
+msds = [1:5;4:8;5:9];
+dtaus = 1:5;
 
-figure()
-plot(f,x,all_p)
-title('Sum of Gaussian Curves and Gaussian Fit')
+errs = std(msds);
+
+avg_msd = mean(msds);
+
+plot(dtaus,msds)
+hold on
+errorbar(dtaus,avg_msd,errs)
+
+hrs = var(msds)./(avg_msd.^2)
+
+
+
+
