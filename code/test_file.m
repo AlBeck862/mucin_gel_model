@@ -798,18 +798,57 @@
 
 %%%%%
 
-msds = [1:5;4:8;5:9];
-dtaus = 1:5;
+% msds = [1:5;4:8;5:9];
+% dtaus = 1:5;
+% 
+% errs = std(msds);
+% 
+% avg_msd = mean(msds);
+% 
+% plot(dtaus,msds)
+% hold on
+% errorbar(dtaus,avg_msd,errs)
+% 
+% hrs = var(msds)./(avg_msd.^2)
 
-errs = std(msds);
+%%%%%
 
-avg_msd = mean(msds);
+iters = 5;
+len = 1e5;
+tests = zeros(iters,len);
 
-plot(dtaus,msds)
+for i = 1:iters
+    test = normrnd(0,i,1,len);
+    tests(i,:) = test;
+    
+%     figure()
+    hist_object = histogram(test,'Normalization','pdf');
+    fit_var = fitdist(test','Normal');
+    eval_vals = (hist_object.BinEdges(1)-0.2:0.001:hist_object.BinEdges(end)+0.2);
+    fit_pdf = pdf(fit_var,eval_vals);
+    hold on
+    plot(eval_vals,fit_pdf,'LineWidth',2)
+    
+    clearvars test
+end
+
+idxs = randi(iters,[1 len]);
+tests_sampled = tests(sub2ind(size(tests),idxs,1:len));
+
+figure()
+hist_object = histogram(tests_sampled,'Normalization','pdf');
+fit_var = fitdist(tests_sampled','Normal');
+eval_vals = (hist_object.BinEdges(1)-0.2:0.001:hist_object.BinEdges(end)+0.2);
+fit_pdf = pdf(fit_var,eval_vals);
 hold on
-errorbar(dtaus,avg_msd,errs)
+plot(eval_vals,fit_pdf,'LineWidth',2)
 
-hrs = var(msds)./(avg_msd.^2)
+%continue with other sigmas, and then sample from multiple distributions
+
+%IDEA: use normrnd in the main script?
+%IDEA: if normrnd is significantly faster: generate a "bank" of possible
+%step sizes for each diffusivity and draw from those if necessary (ie if
+%the particle steps into a region with that diffusivity)
 
 
 
