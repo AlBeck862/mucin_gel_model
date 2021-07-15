@@ -31,11 +31,16 @@ for i = 1:n %iterate through each particle
             break
         end
         
-%         tic
+%         wait_possibility = randi(3);
+        
+%         if wait_possibility ~= 1
         current_displacement_x = round(get_dispmnt_variation(current_diffusivity,x,all_cdf,diffusivities)); %randomly select a distance in the x-direction
         current_displacement_y = round(get_dispmnt_variation(current_diffusivity,x,all_cdf,diffusivities)); %randomly select a distance in the y-direction
-%         toc
-        
+%         else
+%             current_displacement_x = 0;
+%             current_displacement_y = 0;
+%         end
+            
         % Update the particle's position
         data_matrix(i,j,1) = data_matrix(i,j-1,1) + current_displacement_x;
         data_matrix(i,j,2) = data_matrix(i,j-1,2) + current_displacement_y;
