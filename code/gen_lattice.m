@@ -1,4 +1,4 @@
-function [lattice,x,all_cdf,diffusivities] = gen_lattice(save_lattice,lattice_size_x,lattice_size_y,tau,single_diffusivity_toggle,single_diffusivity,import_lattice, invert_grayscale, round_imported_lattice, round_imported_lattice_multiple, multiplier)
+function [lattice,diffusivities] = gen_lattice(save_lattice,lattice_size_x,lattice_size_y,tau,single_diffusivity_toggle,single_diffusivity,import_lattice, invert_grayscale, round_imported_lattice, round_imported_lattice_multiple, multiplier)
 % GEN_LATTICE Generate a lattice environment for diffusion.
 
 %%% DIFFUSIVITY PARAMETERS %%%
@@ -6,12 +6,12 @@ function [lattice,x,all_cdf,diffusivities] = gen_lattice(save_lattice,lattice_si
 % % max_diffusivity = 1.25; %units: um^2/s
 
 % Particle radius: r=60nm
-% min_diffusivity = 0.041;  %units: um^2/s
-% max_diffusivity = 4.090; %units: um^2/s
+min_diffusivity = 0.041;  %units: um^2/s
+max_diffusivity = 4.090; %units: um^2/s
 
 % Particle radius: r=500nm
-min_diffusivity = 0.005;  %units: um^2/s
-max_diffusivity = 0.490; %units: um^2/s
+% min_diffusivity = 0.005;  %units: um^2/s
+% max_diffusivity = 0.490; %units: um^2/s
 
 % Adjust the units of the diffusivities
 min_diffusivity = multiplier*min_diffusivity; %units: 10^-4 um^2/s
@@ -101,16 +101,16 @@ else %manually-designed lattice import
 end
 
 % Generate the CDF corresponding to each diffusivity value in the lattice
-x = linspace(-300,300,3000000);
-all_cdf = zeros(length(diffusivities),length(x));
-for i = 1:length(diffusivities)
-    all_cdf(i,:) = gen_PDF(diffusivities(i),tau,x);
-end
+% x = linspace(-300,300,3000000);
+% all_cdf = zeros(length(diffusivities),length(x));
+% for i = 1:length(diffusivities)
+%     all_cdf(i,:) = gen_PDF(diffusivities(i),tau,x);
+% end
 
 % Save the lattice
 if save_lattice == true
     save('lattice.mat','lattice')
-    save('lattice_data.mat','x','all_cdf','diffusivities')
+    save('diffusivities.mat','diffusivities')
 end
 
 end

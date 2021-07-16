@@ -14,9 +14,13 @@ round_imported_lattice = true;              %false: do not modify the grayscale 
 round_imported_lattice_multiple = 5;        %round the grayscale image's pixel values to the nearest multiple of this value
 multiplier = 10000;                           %lattice scaling: multiply the provided units (e.g. micrometer) by the inverse of this value
 
+if lattice_x*lattice_y > 1e8                %override the save_lattice setting if the lattice variable is too large
+    save_lattice = false;
+end
+
 % Simulation parameters
 time_pts = 5000;                            %total time points (absolute time, camera frame-rate)
-n = 100;                                     %number of simulated particles.
+n = 100;                                    %number of simulated particles.
 start_type = 'random';                      %'center': all particles start at the center of the lattice, 'random': particles are each assigned a random start location, 'other_fixed': all particles start at a hard-coded location
 visualize_lattice = true;                   %false: no visualization, true: visualization
 conversion_factor = 0.1;                    %conversion factor, units of seconds per time point
@@ -24,7 +28,7 @@ conversion_factor = 0.1;                    %conversion factor, units of seconds
 % Plotting parameters
 multiples_delta_time = [1,10,100];          %additional time point intervals for displacement histogram generation (each value corresponds to a set of two histograms (x-direction and y-direction)
 msd_dtau_log = true;                        %false: MSD(delta-tau) plots will be linearly scaled, true: MSD(delta-tau) plots will be logarithmically scaled (this does not affect the line-of-best-fit parameters)
-moving_avg_kernel = round(time_pts/100);    %size of the window over which to average the displacement data when plotting step-size over time
+moving_avg_kernel = 200;  %round(time_pts/100);    %size of the window over which to average the displacement data when plotting step-size over time
 
 % Other parameters
 save_data = false;                          %false: no data variables are saved, true: certain data variables are saved (data_matrix, boundary_collision, all_displacement_storage_x, all_displacement_storage_y)
@@ -38,7 +42,7 @@ try
     disp('Lattice and associated data loaded from file.')
 catch
     tic %begin benchmarking (lattice generation)
-    [lattice,x,all_cdf,diffusivities] = gen_lattice(save_lattice,lattice_x,lattice_y,conversion_factor,single_diffusivity_toggle,single_diffusivity,import_lattice, invert_grayscale, round_imported_lattice, round_imported_lattice_multiple, multiplier);
+    [lattice,diffusivities] = gen_lattice(save_lattice,lattice_x,lattice_y,conversion_factor,single_diffusivity_toggle,single_diffusivity,import_lattice, invert_grayscale, round_imported_lattice, round_imported_lattice_multiple, multiplier);
     toc %end benchmarking (lattice generation)
 end
 
@@ -49,7 +53,7 @@ if lattice_x*lattice_y <= 1e8
 end
 
 %%% WALK SIMULATION %%%
-[data_matrix,boundary_collision] = walk_simulation(n,time_pts,start_type,lattice,save_data,x,all_cdf,diffusivities);
+[data_matrix,boundary_collision] = walk_simulation(n,time_pts,start_type,lattice,save_data,conversion_factor);
 
 %%% WALK VISUALIZATION %%%
 % Display and save the walk visualizations if the image is small enough

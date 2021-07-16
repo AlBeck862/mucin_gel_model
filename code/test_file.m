@@ -813,42 +813,69 @@
 
 %%%%%
 
-iters = 5;
-len = 1e5;
-tests = zeros(iters,len);
+% iters = 5;
+% len = 1e5;
+% tests = zeros(iters,len);
+% 
+% for i = 1:iters
+%     test = normrnd(0,i,1,len);
+%     tests(i,:) = test;
+%     
+% %     figure()
+%     hist_object = histogram(test,'Normalization','pdf');
+%     fit_var = fitdist(test','Normal');
+%     eval_vals = (hist_object.BinEdges(1)-0.2:0.001:hist_object.BinEdges(end)+0.2);
+%     fit_pdf = pdf(fit_var,eval_vals);
+%     hold on
+%     plot(eval_vals,fit_pdf,'LineWidth',2)
+%     
+%     clearvars test
+% end
+% 
+% idxs = randi(iters,[1 len]);
+% tests_sampled = tests(sub2ind(size(tests),idxs,1:len));
+% 
+% figure()
+% hist_object = histogram(tests_sampled,'Normalization','pdf');
+% fit_var = fitdist(tests_sampled','Normal');
+% eval_vals = (hist_object.BinEdges(1)-0.2:0.001:hist_object.BinEdges(end)+0.2);
+% fit_pdf = pdf(fit_var,eval_vals);
+% hold on
+% plot(eval_vals,fit_pdf,'LineWidth',2)
 
+%%%%%
+
+% base_time = 0.1;
+% alpha = 0.9;
+% 
+% lower = 0.1;
+% upper = 1;
+iters = 1e3;
+values = zeros(1,iters);
 for i = 1:iters
-    test = normrnd(0,i,1,len);
-    tests(i,:) = test;
-    
-%     figure()
-    hist_object = histogram(test,'Normalization','pdf');
-    fit_var = fitdist(test','Normal');
-    eval_vals = (hist_object.BinEdges(1)-0.2:0.001:hist_object.BinEdges(end)+0.2);
-    fit_pdf = pdf(fit_var,eval_vals);
-    hold on
-    plot(eval_vals,fit_pdf,'LineWidth',2)
-    
-    clearvars test
+%     num = lower + (upper-lower) .* rand;
+%     values(i) = (base_time^alpha)./(rand.^(1+alpha));
+    values(i) = gprnd(0.1,10,0);
 end
 
-idxs = randi(iters,[1 len]);
-tests_sampled = tests(sub2ind(size(tests),idxs,1:len));
+values = values(values<1e4);
+h = histogram(values,'Normalization','pdf');
+% h.BinWidth = 0.1;
 
-figure()
-hist_object = histogram(tests_sampled,'Normalization','pdf');
-fit_var = fitdist(tests_sampled','Normal');
-eval_vals = (hist_object.BinEdges(1)-0.2:0.001:hist_object.BinEdges(end)+0.2);
-fit_pdf = pdf(fit_var,eval_vals);
-hold on
-plot(eval_vals,fit_pdf,'LineWidth',2)
+% hold on
+% tau = 0.1:00.1:10;
+% wait_dist = (base_time^alpha)./(tau.^(1+alpha));
+% 
+% % wait_dist = 1./(tau.^(1+alpha));
+% 
+% plot(tau,wait_dist)
+% cumtrapz(tau,wait_dist)
 
-%continue with other sigmas, and then sample from multiple distributions
+% area = sum(h.Values)*h.BinWidth
 
-%IDEA: use normrnd in the main script?
-%IDEA: if normrnd is significantly faster: generate a "bank" of possible
-%step sizes for each diffusivity and draw from those if necessary (ie if
-%the particle steps into a region with that diffusivity)
+
+
+
 
 
 

@@ -67,7 +67,7 @@ for i = 1:n
     
     yyaxis right
     plot(rescaled_time(1:length(current_particle_diffs)),current_particle_diffs./multiplier)
-%     plot(movmean(current_particle_diffs,moving_avg_kernel)) %plot using a moving average to smooth out the curve
+%     plot(rescaled_time(1:length(current_particle_diffs)),movmean(current_particle_diffs./multiplier,moving_avg_kernel)) %plot using a moving average to smooth out the curve
     ylabel('Diffusivity [\mum^2/s]')
     
 	file_str = strcat(['/temp_results/step_sizes/stepsizes_dx_particle' num2str(i) '.jpeg']);
