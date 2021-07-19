@@ -845,33 +845,117 @@
 
 %%%%%
 
-% base_time = 0.1;
-% alpha = 0.9;
+% % base_time = 0.1;
+% % alpha = 0.9;
+% % 
+% % lower = 0.1;
+% % upper = 1;
+% iters = 1e3;
+% values = zeros(1,iters);
+% for i = 1:iters
+% %     num = lower + (upper-lower) .* rand;
+% %     values(i) = (base_time^alpha)./(rand.^(1+alpha));
+%     values(i) = gprnd(0.1,10,0);
+% end
 % 
-% lower = 0.1;
-% upper = 1;
-iters = 1e3;
-values = zeros(1,iters);
-for i = 1:iters
-%     num = lower + (upper-lower) .* rand;
-%     values(i) = (base_time^alpha)./(rand.^(1+alpha));
-    values(i) = gprnd(0.1,10,0);
+% values = values(values<1e4);
+% h = histogram(values,'Normalization','pdf');
+% % h.BinWidth = 0.1;
+% 
+% % hold on
+% % tau = 0.1:00.1:10;
+% % wait_dist = (base_time^alpha)./(tau.^(1+alpha));
+% % 
+% % % wait_dist = 1./(tau.^(1+alpha));
+% % 
+% % plot(tau,wait_dist)
+% % cumtrapz(tau,wait_dist)
+% 
+% % area = sum(h.Values)*h.BinWidth
+
+%%%%%
+
+% time_pts = 10000;
+% dt_min = 0.1; %seconds
+% dt_max = 1e4; %seconds (approx. 2.77 hours)
+% log_dt_min = log10(dt_min);
+% log_dt_max = log10(dt_max);
+% 
+% r = log_dt_min + (log_dt_max-log_dt_min).*rand([time_pts,1]);
+% times = 10.^r;
+% 
+% % min(times)
+% % max(times)
+% % 
+% % histogram(times)
+% 
+% n = 100; %number of particles
+% loc_x = zeros(n,time_pts); %particles positions
+% 
+% for i = 1:n
+%     for j = 2:time_pts
+%         dx = normrnd(0,1);
+%         loc_x(i,j) = loc_x(i,j-1) + times(j)*dx;
+%     end
+%     disp(i)
+% end
+% 
+% cumulative_times = cumsum(times);
+% 
+% for i = 1:n
+%     plot(cumulative_times,loc_x(i,:))
+%     hold on
+% end
+
+%%%%%
+
+time_pts = 1e6;
+dtau_min = 1; %seconds
+dtau_max = 1e4; %seconds (approx. 2.77 hours)
+log_dtau_min = log10(dtau_min);
+log_dtau_max = log10(dtau_max);
+
+num_dtaus = 1000; %number of dtau values for which to compute MSD(dtau) values
+
+r = randi([log_dtau_min,log_dtau_max],[num_dtaus,1]);
+dtaus = 10.^r;
+% Source: Khan and Mason (2007)
+
+% min(times)
+% max(times)
+% 
+% histogram(times)
+
+n = 100; %number of particles
+loc_x = zeros(n,time_pts); %particles positions
+
+for i = 1:n
+    for j = 2:time_pts
+        loc_x(i,j) = loc_x(i,j-1) + normrnd(0,1);
+    end
+    disp(i)
 end
 
-values = values(values<1e4);
-h = histogram(values,'Normalization','pdf');
-% h.BinWidth = 0.1;
+msds_per_particle = zeros(n,num_dtaus);
+msds = zeros(num_dtaus);
+iteration = 1;
+for dtau = dtaus
+    for i = 1:n
+        msds_per_particle(i,iteration) = loc_x(i,(dtau+1):dtau:end) - loc_x(i,1:dtau:end-1);
+        iteration = iteration + 1;
+    end
+    
+    % TO BE CONTINUED
+    
+end
+% To-do: compute MSDs for each value of dtau for each particle, and then average over all particles
 
-% hold on
-% tau = 0.1:00.1:10;
-% wait_dist = (base_time^alpha)./(tau.^(1+alpha));
-% 
-% % wait_dist = 1./(tau.^(1+alpha));
-% 
-% plot(tau,wait_dist)
-% cumtrapz(tau,wait_dist)
+for i = 1:n
+    plot(loc_x(i,:))
+    hold on
+end
 
-% area = sum(h.Values)*h.BinWidth
+
 
 
 
