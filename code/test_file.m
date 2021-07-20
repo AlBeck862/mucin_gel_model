@@ -915,18 +915,22 @@ dtau_max = 1e4; %seconds (approx. 2.77 hours)
 log_dtau_min = log10(dtau_min);
 log_dtau_max = log10(dtau_max);
 
-num_dtaus = 1000; %number of dtau values for which to compute MSD(dtau) values
+% num_dtaus = 1e3; %number of dtau values for which to compute MSD(dtau) values
+num_dtaus = 1e1;
 
-r = randi([log_dtau_min,log_dtau_max],[num_dtaus,1]);
-dtaus = 10.^r;
+% r = randi([log_dtau_min,log_dtau_max],[num_dtaus,1]);
+r = log_dtau_min + (log_dtau_max-log_dtau_min)*rand([num_dtaus,1]);
+dtaus = round(10.^r);
 % Source: Khan and Mason (2007)
+
+dtaus = sort(dtaus)
 
 % min(times)
 % max(times)
 % 
 % histogram(times)
 
-n = 100; %number of particles
+n = 25; %number of particles
 loc_x = zeros(n,time_pts); %particles positions
 
 for i = 1:n
@@ -937,23 +941,37 @@ for i = 1:n
 end
 
 msds_per_particle = zeros(n,num_dtaus);
-msds = zeros(num_dtaus);
+% msds = zeros(num_dtaus);
 iteration = 1;
-for dtau = dtaus
-    for i = 1:n
-        msds_per_particle(i,iteration) = loc_x(i,(dtau+1):dtau:end) - loc_x(i,1:dtau:end-1);
-        iteration = iteration + 1;
+for dtau = dtaus'
+    if dtau == 1
+        for i = 1:n
+             msd_temp = loc_x(i,2:dtau:end) - loc_x(i,1:dtau:(end-1));
+             msds_per_particle(i,iteration) = mean(msd_temp);
+        end
+    else
+        for i = 1:n
+%             msd_temp = loc_x(i,(dtau+1):dtau:end) - loc_x(i,1:dtau:(end-dtau-1)); 
+            msd_temp = loc_x(i,(dtau+1):dtau:end) - loc_x(i,1:dtau:(end-dtau));
+            msds_per_particle(i,iteration) = mean(msd_temp);
+        end
     end
-    
-    % TO BE CONTINUED
-    
+    iteration = iteration + 1;
 end
 % To-do: compute MSDs for each value of dtau for each particle, and then average over all particles
 
-for i = 1:n
-    plot(loc_x(i,:))
-    hold on
-end
+msds = mean(msds_per_particle,1)
+
+figure()
+plot(dtaus,msds)
+
+figure()
+loglog(dtaus,msds)
+
+% for i = 1:n
+%     plot(loc_x(i,:))
+%     hold on
+% end
 
 
 

@@ -24,10 +24,17 @@ for i = 1:n %iterate through each particle
     for j = 2:time_pts %for each particle, iterate through each time point
         %%%NEW
         if waiting
-            current_displacement_x = 0;
-            current_displacement_y = 0;
+            try
+                current_diffusivity = round(lattice(data_matrix(i,j-1,1),data_matrix(i,j-1,2))/10);
+            catch
+                disp('WARNING. The particle struck the boundary and was rendered immobile.')
+                data_matrix(i,j-1,1) = 0;   %remove the displacement that crosses the boundary
+                data_matrix(i,j-1,2) = 0;   %remove the displacement that crosses the boundary
+                boundary_collision(i) = 1;  %remember that this particle struck the boundary
+                break
+            end
+
         else
-        
             try
                 current_diffusivity = lattice(data_matrix(i,j-1,1),data_matrix(i,j-1,2));
             catch
@@ -40,12 +47,12 @@ for i = 1:n %iterate through each particle
 
     %         current_displacement_x = round(get_dispmnt_variation(current_diffusivity,x,all_cdf,diffusivities)); %randomly select a distance in the x-direction
     %         current_displacement_y = round(get_dispmnt_variation(current_diffusivity,x,all_cdf,diffusivities)); %randomly select a distance in the y-direction
-
-            current_sigma = sqrt(2*double(current_diffusivity)*conversion_factor);
-            current_displacement_x = round(normrnd(0,current_sigma));
-            current_displacement_y = round(normrnd(0,current_sigma));
-
+        
         end
+        
+        current_sigma = sqrt(2*double(current_diffusivity)*conversion_factor);
+        current_displacement_x = round(normrnd(0,current_sigma));
+        current_displacement_y = round(normrnd(0,current_sigma));
         
         % Update the particle's position
         data_matrix(i,j,1) = data_matrix(i,j-1,1) + current_displacement_x;

@@ -20,7 +20,7 @@ end
 
 % Simulation parameters
 time_pts = 5000;                            %total time points (absolute time, camera frame-rate)
-n = 100;                                    %number of simulated particles.
+n = 25;                                    %number of simulated particles.
 start_type = 'random';                      %'center': all particles start at the center of the lattice, 'random': particles are each assigned a random start location, 'other_fixed': all particles start at a hard-coded location
 visualize_lattice = true;                   %false: no visualization, true: visualization
 conversion_factor = 0.1;                    %conversion factor, units of seconds per time point
