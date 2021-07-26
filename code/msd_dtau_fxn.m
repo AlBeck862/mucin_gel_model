@@ -1,7 +1,8 @@
 function f = msd_dtau_fxn(x,lagT,msd)
 
 for i=1:1:length(lagT)
-    msd_fit(i) = 4*x(1)*lagT(i)^x(2);
+    msd_fit(i) = 4*x(1)*lagT(i)^x(2); %use for 2D simulations
+%     msd_fit(i) = 2*x(1)*lagT(i)^x(2); %use for 1D simulations
 
 %     msd_fit(i) = 4*exp(-abs(x(1)))*lagT(i)^exp(-abs(x(2)));
 %     msd_fit(i) = 4*10^(-abs(x(1)))*lagT(i)^10^(-abs(x(2)));    
