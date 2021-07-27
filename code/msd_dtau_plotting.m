@@ -143,7 +143,7 @@ for i = 1:length(segments)
     try
         [Dfit, alphafit] = msd_dtau_fitting(0.01,1,delta_taus(find(rescaled_time==segments(i)):find(rescaled_time==segments(i+1))),msd_tau_plotting(find(rescaled_time==segments(i)):find(rescaled_time==segments(i+1))));
         diffusivity_disp_str = strcat(['Diffusion constant from the line of best fit (' num2str(segments(i)) 's - ' num2str(segments(i+1)) 's' '): ' num2str(Dfit)]);
-        alpha_disp_str = strcat(['Alpha from the line of best fit: (' num2str(segments(i)) 's - ' num2str(segments(i+1)) 's' '): ' num2str(alphafit)]);
+        alpha_disp_str = strcat(['Alpha from the line of best fit (' num2str(segments(i)) 's - ' num2str(segments(i+1)) 's' '): ' num2str(alphafit)]);
         plot((delta_taus(find(rescaled_time==segments(i)):find(rescaled_time==segments(i+1)))*conversion_factor),4.*Dfit.*delta_taus(find(rescaled_time==segments(i)):find(rescaled_time==segments(i+1))).^alphafit,'Linewidth',3,'Color','yellow','LineStyle','--')
         legend_str = strcat(['Line of Best Fit: ' num2str(segments(i)) 's - ' num2str(segments(i+1)) 's']);
         legend_array{end+1} = legend_str;
@@ -154,7 +154,7 @@ for i = 1:length(segments)
         else
             [Dfit, alphafit] = msd_dtau_fitting(0.01,1,delta_taus(find(rescaled_time==segments(i)):end),msd_tau_plotting(find(rescaled_time==segments(i)):end));
             diffusivity_disp_str = strcat(['Diffusion constant from the line of best fit (' num2str(segments(i)) 's - end): ' num2str(Dfit)]);
-            alpha_disp_str = strcat(['Alpha from the line of best fit: (' num2str(segments(i)) 's - end): ' num2str(alphafit)]);
+            alpha_disp_str = strcat(['Alpha from the line of best fit (' num2str(segments(i)) 's - end): ' num2str(alphafit)]);
             plot((delta_taus(find(rescaled_time==segments(i)):end)*conversion_factor),4.*Dfit.*delta_taus(find(rescaled_time==segments(i)):end).^alphafit,'Linewidth',3,'Color','yellow','LineStyle','--')
             legend_str = strcat(['Line of Best Fit: ' num2str(segments(i)) 's - end']);
             legend_array{end+1} = legend_str;

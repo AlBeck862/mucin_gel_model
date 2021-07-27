@@ -1,0 +1,11 @@
+Particle radius: 0.000001, medium viscosity: 0.000890, diffusivity: 0.255125
+
+Time steps defined in 0.013473 seconds.
+Base distributions generated in 1.248209 seconds.
+Scaled distributions generated in 0.271244 seconds.
+Overall trajectories computed in 0.451031 seconds.
+MSD computed in 3.174864 seconds.
+Simulation complete in 7.413283 seconds.
+
+Diffusion constant from the line of best fit: 0.25478
+Alpha from the line of best fit: 0.99995
