@@ -908,3 +908,43 @@
 % end
 
 %%%%%
+
+% num_time_pts = 1e5;
+% dim_x = 1e10;
+% dim_y = 1e10;
+% s = spalloc(dim_y,dim_x,num_time_pts);
+
+%%%%%
+
+viscosity = abs(normrnd(8.9e-4,1e-3,[1 1e5]));
+histogram(viscosity)
+
+%%%%%
+
+% tic
+% viscosity = zeros(1,1e5);
+% for i = 1:1e5
+%     viscosity(i) = i;
+% end
+% toc
+
+%%%%%
+
+% test = betarnd(5,1,[1 1e8]);
+% histogram(test)
+
+%%%%%
+
+
+
+
+
+
+
+
+
+
+
+
+
+

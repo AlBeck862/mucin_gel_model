@@ -10,18 +10,9 @@ log_dt_min = log10(dt_min);
 log_dt_max = log10(dt_max);
 
 % Basic simulation parameters
-num_particles = 1e3; %number of particles to simulate
-num_time_pts = 1e5; %number of time points (each separated by a randomly-sized time step)
+num_particles = 5e3; %number of particles to simulate
+num_time_pts = 5e4; %number of time points (each separated by a randomly-sized time step)
 conversion_factor = 1; %seconds per time point
-
-% Define the diffusion coefficient
-radius = 1e-6; %m
-viscosity = 8.9e-4; %Pa*s [kg/(m*s)]
-kb = 1.38064852e-23; %m^2*kg/(s^2*K)
-T = 310; %K (37C)
-diffusivity = 1e12*(kb*T/(6*pi*viscosity*radius)); %um^2/s
-% diffusivity = 1; %um^2/s TEMPORARY OVERRIDE
-fprintf(fid,'Particle radius: %f, medium viscosity: %f, diffusivity: %f\n\n',radius,viscosity,diffusivity);
 
 % Source: Khan and Mason (2014)
 % Define the time steps
@@ -45,10 +36,42 @@ bench_time_disp = strcat(['Base distributions generated in ' num2str(bench_time)
 disp(bench_time_disp)
 fprintf(fid,'Base distributions generated in %f seconds.\n',bench_time);
 
+% Define the diffusion coefficient
+radius = 1e-6; %m
+% viscosity = 8.9e-4; %Pa*s [kg/(m*s)]
+viscosity = abs(normrnd(8.9e-4,1e-4,[1 num_time_pts])); %Pa*s [kg/(m*s)]
+% viscosity = abs(normrnd(8.9e-4,1e-3,[1 num_time_pts])); %Pa*s [kg/(m*s)]
+
+% viscosity = zeros(1,num_time_pts);
+% num_sections = 1e4;
+% start_idx = 1;
+% end_idx = round(num_time_pts/num_sections);
+% for i = 1:num_sections
+%     if i == num_sections
+%         viscosity(start_idx:end) = 8.9e-4*i;
+%         break
+%     end
+%     
+%     viscosity(start_idx:end_idx) = 8.9e-4*i;
+%     start_idx = end_idx;
+%     end_idx = end_idx + round(num_time_pts/num_sections);
+% end
+
+% for i = 1:num_time_pts
+%     select = 
+%     
+% end
+
+kb = 1.38064852e-23; %m^2*kg/(s^2*K)
+T = 310; %K (37C)
+diffusivity = 1e12.*((kb*T)./(6*pi*viscosity*radius)); %um^2/s
+% diffusivity = 1; %um^2/s TEMPORARY OVERRIDE
+fprintf(fid,'Particle radius: %f, medium viscosity: %f, diffusivity: %f\n\n',radius,viscosity,diffusivity);
+
 % Source: Khan and Mason (2014)
 % Scale the normal distributions according to each time step
 tic
-mult_factor = sqrt(2*diffusivity*time_pts'); %multiply by the conversion factor? *****
+mult_factor = sqrt(2*diffusivity.*time_pts'); %multiply by the conversion factor? *****
 scaled_dist_x = mult_factor.*base_dist_x;
 scaled_dist_y = mult_factor.*base_dist_y;
 bench_time = toc;
